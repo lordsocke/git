@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.log
+
+# Generated snapshots — keep the folder and the committed example, ignore the
+# live rolling output.
+snapshots/odds-latest.json

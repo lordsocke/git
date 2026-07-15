@@ -1,0 +1,165 @@
+{
+  "id": 3195790822,
+  "teams": [
+    {
+      "order": 0,
+      "id": 1422,
+      "name": "Frankreich"
+    },
+    {
+      "order": 1,
+      "id": 1426,
+      "name": "Spanien"
+    }
+  ],
+  "startTime": "2026-07-14T19:00:00Z",
+  "type": 4,
+  "sport": 1,
+  "leagueInfo": {
+    "id": 33435,
+    "order": 102,
+    "name": "WM 2026 KO-Phase",
+    "middleName": "WM 2026 KO-Phase",
+    "shortName": "WM 2026 KO-Phase",
+    "longTerm": false
+  },
+  "markets": [
+    {
+      "id": 59252,
+      "text": "Wer gewinnt das Spiel",
+      "categoryIds": [
+        1
+      ],
+      "subcategoryIds": [
+        1
+      ],
+      "placeholders": [],
+      "isPrimary": true,
+      "tips": [
+        {
+          "id": 5925201,
+          "text": "1",
+          "odds": 230
+        },
+        {
+          "id": 5925202,
+          "text": "X",
+          "odds": 325
+        },
+        {
+          "id": 5925203,
+          "text": "2",
+          "odds": 331
+        }
+      ]
+    },
+    {
+      "id": 59262,
+      "text": "Doppelchance",
+      "categoryIds": [
+        1
+      ],
+      "subcategoryIds": [
+        5
+      ],
+      "placeholders": [],
+      "isPrimary": false,
+      "tips": [
+        {
+          "id": 5926201,
+          "text": "1X",
+          "odds": 135
+        },
+        {
+          "id": 5926202,
+          "text": "12",
+          "odds": 127
+        },
+        {
+          "id": 5926203,
+          "text": "X2",
+          "odds": 163
+        }
+      ]
+    },
+    {
+      "id": 61402,
+      "text": "1. HZ Over + / Under - 2.5",
+      "categoryIds": [
+        2,
+        5
+      ],
+      "subcategoryIds": [
+        26
+      ],
+      "placeholders": [
+        "2.5"
+      ],
+      "isPrimary": false,
+      "tips": [
+        {
+          "id": 6140201,
+          "text": "3+",
+          "odds": 651
+        },
+        {
+          "id": 6140203,
+          "text": "0-2",
+          "odds": 108
+        }
+      ]
+    },
+    {
+      "id": 60252,
+      "text": "Over + / Under -  2.5",
+      "categoryIds": [
+        2
+      ],
+      "subcategoryIds": [
+        9
+      ],
+      "placeholders": [
+        "2.5"
+      ],
+      "isPrimary": false,
+      "tips": [
+        {
+          "id": 6025201,
+          "text": "3+",
+          "odds": 187
+        },
+        {
+          "id": 6025203,
+          "text": "0-2",
+          "odds": 187
+        }
+      ]
+    },
+    {
+      "id": 62262,
+      "text": "2. HZ Over + / Under - 2.5",
+      "categoryIds": [
+        5
+      ],
+      "subcategoryIds": [
+        27
+      ],
+      "placeholders": [
+        "2.5"
+      ],
+      "isPrimary": false,
+      "tips": [
+        {
+          "id": 6226201,
+          "text": "3+",
+          "odds": 433
+        },
+        {
+          "id": 6226203,
+          "text": "0-2",
+          "odds": 118
+        }
+      ]
+    }
+  ]
+}

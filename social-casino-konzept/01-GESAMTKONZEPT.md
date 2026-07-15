@@ -1,616 +1,428 @@
-# Gesamtkonzept: „ARENA" — Social-Casino- & Social-Sportsbook-App (Virtual Currency)
+# Gesamtkonzept v3: „ARENA" — Social-Sportsbook-App mit Evergreen-Liga (Virtual Currency)
 
-**Arbeitstitel:** ARENA (Platzhalter, Naming siehe Kap. 14 — aus markenrechtlichen Gründen ggf. bewusst getrennt von der Sportwetten-Dachmarke)
-**Auftraggeber:** Internationaler Sportwetten-Anbieter (Top-Tier)
-**Plattform:** iOS (nativ), App Store, 18+
-**Währungsmodell:** Eine einzige Währung — **Coins** (keine Premium-Währung, kein Cash-out, kein Handel)
-**Vorbild:** Slotomania (Playtika), erweitert um Free-to-play-Sportwetten und ein Club-System nach Clash-of-Clans-Vorbild
-**Stand:** Juli 2026 · Basis: Research-Anhänge A–C (Slotomania-Deepdive, Wettbewerbslandschaft, Technik & Regulatorik)
+**Arbeitstitel:** ARENA (Platzhalter; Naming nach Markenentscheidung, Kap. 19)
+**Auftraggeber:** Internationaler Sportwetten-Anbieter — **unbestätigte Arbeitsannahme: Merkur Bets (Gauselmann-Gruppe)**; Quoten-/Ergebnis-Feed hausintern über die **Cashpoint-Plattform**. *Die Bestätigung dieser Annahme ist Gate G0 vor allen Phase-0-Ausgaben (Kap. 23, Risiko 1).*
+**Plattform:** iOS (nativ, SwiftUI + SpriteKit), App Store, 18+ · Landscape als Arbeitsentscheidung (Kap. 16)
+**Währungsmodell:** Eine Währung — **Coins** (keine Premium-Währung, kein Cash-out, kein Handel) + **Freispiele** als nicht kaufbare Zweitressource
+**Betriebsmodus:** **Engagement-/Markenprodukt** (Kap. 17)
+**Stand:** v3 Revision 1, 12.07.2026 — Erstfassung v3 vom selben Tag, überarbeitet nach 4-Perspektiven-Review mit adversarialer Verifikation (~40 bestätigte Findings eingearbeitet) · v1-Archiv: [ARCHIV-01-GESAMTKONZEPT-v1.md](ARCHIV-01-GESAMTKONZEPT-v1.md)
+**Referenz-Artefakte:** [POC v3](../social-casino-poc/) (HTML, Portrait) · [Native iOS-App](../arena-ios/) (SwiftUI, Landscape). Beide implementieren die Kernsysteme in Demo-Vereinfachung; **normativ ist dieses Dokument** — wo Artefakte abweichen, ist das je Stelle vermerkt.
 
 ---
 
-## Inhaltsverzeichnis
+## Änderungsprotokoll v1 → v3 (Kurzfassung)
 
-1. [Executive Summary](#1-executive-summary)
-2. [Markt & Positionierung](#2-markt--positionierung)
-3. [Produktvision & Spielsäulen](#3-produktvision--spielsäulen)
-4. [Zielgruppen & Spielertypen](#4-zielgruppen--spielertypen)
-5. [Core Loops](#5-core-loops)
-6. [Coin-Ökonomie (Ein-Währungs-Modell)](#6-coin-ökonomie-ein-währungs-modell)
-7. [Leveling & Progression](#7-leveling--progression)
-8. [Das Bonus-System (inkl. 3-Stunden-Bonus & Special Bonus)](#8-das-bonus-system)
-9. [Clubs — das soziale Rückgrat](#9-clubs--das-soziale-rückgrat)
-10. [Virtuelles Sportsbook & Live-Wetten](#10-virtuelles-sportsbook--live-wetten)
-11. [Challenges, Events, Seasons & LiveOps](#11-challenges-events-seasons--liveops)
-12. [Statistiken, Leaderboards & Profile](#12-statistiken-leaderboards--profile)
-13. [Retention-Architektur: der Tag / die Woche / die Season eines Spielers](#13-retention-architektur)
-14. [UX, Animationen & Game Feel](#14-ux-animationen--game-feel)
-15. [Monetarisierung](#15-monetarisierung)
-16. [Responsible Gaming & Ethik](#16-responsible-gaming--ethik)
-17. [Regulatorik & Store-Compliance](#17-regulatorik--store-compliance)
-18. [Technische Architektur](#18-technische-architektur)
-19. [Analytics & KPIs](#19-analytics--kpis)
-20. [Roadmap & MVP-Schnitt](#20-roadmap--mvp-schnitt)
-21. [Risiken & offene Entscheidungen](#21-risiken--offene-entscheidungen)
+| Bereich | v1 | v3 |
+|---|---|---|
+| Produktkern | Slots als Kern-Loop + Sport | **Sport ist der Kern**; Slots nur Freispiel-Minigame „Arena Spins" (kein Coin-Einsatz) |
+| Evergreen-Achse | Slots | **ARENA Liga** (virtuelle Spiele) — übernimmt die *Verfügbarkeits-Rolle* der Slots; die *Frequenz-Rolle* bewusst nicht (Kap. 9) |
+| Haupt-Coin-Senke | Slot-Einsätze | Liga-Hold (7,5 % des Einsatzes) + Stadion + Duell-Rake + Club-Gründung + Turnier-Buy-ins (Ph. 2) |
+| Betriebsmodus | offen | **Engagement/Marke** — mit Messbarkeits-Auflagen (Kap. 17) |
+| Appointment-Layer | 3h-Bonus, Streaks, Challenges | + **Tages-Tipp-Serie** |
+| Social | Clubs | + **Tipp-Duell** (Escrow, 5 % Rake, nur Club); Copy-Bet/Tipp-teilen Phase 3 |
+| Meta | Album, Kosmetik | + **Stadionausbau** (Senke + Status + Bonus-Boost; kein Quotenboost) |
+| Einsätze | Presets | **Slider**, Max am Level gecapt (2er-Bänder ×1,25, abgerundet auf 5.000er) |
+| Orientierung | Portrait implizit | **Landscape als Arbeitsentscheidung** + Test-Gate (Kap. 16) |
+| Plattform-Weiche | offen | **SwiftUI-first, kein Unity**; Android Kotlin (Timing: Kap. 22) |
+| Sportdaten | externer Vertrag (Risiko) | **Cashpoint-Feed hausintern** (unter Merkur-Annahme) |
+| Status-Track (VIP-Ersatz) | hebt Bonus ×1,0–1,6 | **Bewusst geändert:** rein kosmetisch/progressiv, KEIN Bonus-Multiplikator (Multiplikator-Budget, Kap. 6.3); Geschenk-Limits bleiben statusabhängig |
+| North-Star | „Spins + settled Bets/DAU" | „**settled Coin-Einsätze (Realsport + Liga) + Duelle pro DAU**" (nur Senken-Aktionen; Definition Kap. 21) |
 
 ---
 
 ## 1. Executive Summary
 
-ARENA kombiniert drei bewährte, bisher nie gemeinsam umgesetzte Bausteine in einer einzigen Coin-Ökonomie:
+ARENA kombiniert drei Bausteine in einer Coin-Ökonomie:
 
-1. **Social-Casino-Slots** nach Slotomania-Vorbild (Kern-Loop, Level-Progression, Bonus-Kadenz),
-2. **ein virtuelles Sportsbook** mit Pre-Match- und Live-Wetten auf echte Sportereignisse (nach Fliff/Rebet-Vorbild) — das natürliche Heimspiel des Auftraggebers,
-3. **Clubs** als soziales Netzwerk im Spiel (nach Clash-of-Clans-/Huuuge-Vorbild) mit Chat, gemeinsamen Zielen, Ligen und Club-vs-Club-Events.
+1. **Echtes virtuelles Sportsbook** (Pre-Match + Live + Cash-out) auf reale Spiele mit den Quoten des Betreibers (Cashpoint-Feed).
+2. **ARENA Liga** — simulierte Spiele fiktiver Teams im ~3-Minuten-Takt: der immer verfügbare Kern-Loop und die Haupt-Coin-Senke (Hold 7,5 %), mit Sofort-Settlement als D0-Dopamin-Anker.
+3. **Clubs** — Chat, Chest, Club-Liga, Derby, **Tipp-Duelle** (1-gegen-1 mit Escrow).
 
-Die Wettbewerbsanalyse (Anhang B) bestätigt: **Dieser Dreiklang ist ein unbesetzter Whitespace.** Social Casinos (Slotomania, Huuuge, Cash Frenzy) haben keinen Sportbezug; Social Sportsbooks (Fliff, Rebet) haben kein Casino-Metagame und keine Clubs. Ein Sportwetten-Anbieter bringt genau die Assets mit, die den Unterschied machen: Odds-Feeds, Sport-Know-how, Markenvertrauen und eine sportaffine Zielgruppe.
+Slots existieren nur als Bonus-Minispiel „Arena Spins" (freispiel-only) — die Kundenvorgabe „Guthaben nicht über Slots drehen" ist strukturell erfüllt.
 
-**Warum der Sport-Teil strategisch entscheidend ist:** Slots erzeugen Sessions, aber Sport erzeugt *Termine*. Ein Bundesliga-Samstag, ein Champions-League-Abend, ein NFL-Sonntag sind externe Appointment-Mechaniken, die kein Spiel-Designer bauen muss — sie existieren bereits im Leben der Zielgruppe. Die App verbindet den „immer verfügbaren" Slot-Loop mit dem „terminierten" Sport-Loop und deckt so beide Retention-Achsen ab.
+**Ehrliche Einordnung des Reifegrads (aus dem Review):**
+- Die **Mechanik** ist in zwei Artefakten prototypisch erprobt; die Liga-Preisbildung ist seit 12.07. **exakt aus dem Simulationsmodell abgeleitet und numerisch verifiziert** (EV je Markt ≈ −7,5 %, Kap. 6.6).
+- Die **Balancierung ist offen**: Die aktuellen Demo-Belohnungswerte verletzen die eigene Faucet/Sink-Regel um Faktor ~4–8 (Kap. 6.2) — das Ökonomie-Simulationspaket in Phase 0 ist deshalb ein hartes Gate, kein Begleitprojekt.
+- Die **Liga-Taktung** (ein Spiel parallel, ~3-Min-Zyklus) ist als Session-Träger plausibel, aber unvalidiert — Frequenz-/Parallelitätsfragen sind explizit offene Produktentscheidungen (Kap. 9).
 
-**Kernentscheidungen dieses Konzepts:**
+**Größte Risiken (Kap. 23):** (1) unbestätigte Merkur-Annahme trägt Feed, Regulatorik-Story und Naming (Gate G0); (2) Ökonomie-Balancierung; (3) Rechtsgutachten v3 (Dachmarke, Liga-/Duell-Einordnung, BFSG); (4) Duell-Collusion.
 
-| Thema | Entscheidung | Begründung |
+---
+
+## 2. Produktentscheidungen & Herleitung
+
+| # | Entscheidung (09.–12.07.2026) | Begründung / Status |
 |---|---|---|
-| Währung | Nur Coins (Kundenvorgabe) | Machbar; zweite Progressionsachse läuft über XP/Status/Sammelobjekte statt Premium-Währung (Kap. 6) |
-| Leveling | XP = Einsatz + gedeckelter Gewinnanteil (Kundenvorgabe „Mischung aus eingesetztem und gewonnenem Geld") | Formel & Exploit-Schutz in Kap. 7 |
-| Bonus | 3-Stunden-Bonus, jeder 3. Claim = Special Bonus, skaliert mit Level (Kundenidee, ausgebaut) | Vollständiges Design in Kap. 8 |
-| Plattform | Nativ iOS: SwiftUI-Shell + SpriteKit/Metal-Slot-Renderer | Kundenpräferenz; beste „Game Feel"-Antwort (Kap. 18). Wichtigste Gegenposition: Unity, falls Android zeitnah folgt — Entscheidung muss **vor** Entwicklungsstart fallen |
-| Latenz/„Hakeligkeit" | Server-autoritativer RNG, aber Latenz vollständig hinter Animationen versteckt (Optimistic UI, Pre-Fetch, WebSockets) | Client-Autorität wäre bei einer Casino-Ökonomie ein Cheating-Desaster; das flüssige Gefühl erreicht man architektonisch anders (Kap. 18.2) |
-| Marke | Separates Branding prüfen | § 5 GlüStV-Dachmarkenrisiko in DE, Gateway-Kritik (Kap. 17) |
+| E1 | v2-Pivot bestätigt: Sport-Kern, Slots freispiel-only | Kundenfeedback; strukturell statt kosmetisch umgesetzt |
+| E2 | ARENA Liga als Ersatz-Achse | Deepdive: Pivot entfernte Minuten-Loop + Haupt-Sink (Faucet/Sink-Lücke Faktor ~15). Liga = sport-authentische Antwort. *Ersetzt die Verfügbarkeit, nicht die Slot-Frequenz — Kap. 9* |
+| E3 | Engagement-Modus | Ohne Slot-Burn kein Casino-ARPDAU; Markenbindung als Primärzweck. *Auflage: messbar machen (Kap. 17), sonst nicht steuerbar* |
+| E4 | Landscape — **Arbeitsentscheidung** | Kundenpräferenz nach Gerätetest. Bindend für die Prototypen; **final erst nach Usability-Test mit vorab definierten Kriterien** (Kap. 16) — beide Orientierungen existieren als Artefakte |
+| E5 | Stadion = Bonus-Boost, kein Quotenboost | Quotenboost = Senken-Schwächung + Pay-to-Win + „kaufbare Gewinnchancen" (regulatorisch/reputativ heikel) |
+| E6 | Tipp-Duell nur im Club | Kundenwunsch; präzisiert v1 Kap. 10.4; Club-Bindung als Voraussetzung |
+| E7 | Einsatz-Slider, Level-Cap | Kundenwunsch; implementiert v1-Einsatz-Progression sichtbar |
+| E8 | Quoten: Merkur Bets/Cashpoint | Kundenvorgabe; **gilt nur unter der Merkur-Annahme — Gate G0**; Plan B: Sportradar/Genius (F2P-Klausel, Kosten/Dauer ungeklärt) + separate Marke |
+| E9 | Kein Unity; Android Kotlin | Slot-Core ist Overlay-Modul; >90 % Standard-UI. *Android-Timing neu abzuwägen — Engagement-Ziel DE braucht Android-Masse (Kap. 22)* |
 
-**Größte Risiken (Kap. 21):** (1) das deutsche Werberecht (Dachmarke), (2) die Balance der Ein-Währungs-Ökonomie (Playtikas 2025er-Einbruch von −46,7 % YoY nach einem Ökonomie-Rebalancing ist das Warnbeispiel), (3) Reputations-/Gateway-Kritik, weil der Betreiber ein Echtgeld-Anbieter ist.
+### 2.1 Positionierung & was wir bewusst NICHT bauen (aus v1 übernommen, v3-aktualisiert)
 
----
+> **„Die Arena für Sportfans: Tippen, Liga, Teamgeist — ohne echtes Geld zu riskieren."**
 
-## 2. Markt & Positionierung
-
-### 2.1 Markt
-
-- Social Casino global: ~8,5 Mrd. USD (2024), ~9 % CAGR → ~14,3 Mrd. USD bis 2030.
-- Genre-Ökonomie: ARPDAU 0,4–1,0 USD (Spitze SciPlay ~0,94 USD 2024), Payer-Konversion 2–6 %, stark Whale-getrieben.
-- Casino-/Card-Genres haben die **beste Mittel- und Langfrist-Retention** aller Mobile-Genres (Habitual Play).
-- Social Sportsbooks (Fliff, Rebet) wachsen schnell, sind aber (a) US-zentriert, (b) meist Sweepstakes-basiert (rechtlich riskant, 2025er-Verbotswelle in mehreren US-Staaten) und (c) ohne Casino-/Club-Metagame.
-
-### 2.2 Positionierung
-
-> **„Die Arena für Sportfans: Zocken, Tippen, Teamgeist — ohne echtes Geld zu riskieren."**
-
-- **Gegen Slotomania:** Wir haben Sport — echte Spiele, echte Quoten, echte Samstage. Und ein echtes Club-System statt rudimentärer Clans.
-- **Gegen Fliff/Rebet:** Wir haben ein vollwertiges Casino-Metagame (Slots, Level, Sammelalbum, Events) und Clubs — also Beschäftigung *zwischen* den Spieltagen.
-- **Gegen alle:** Eine ehrliche Ein-Währungs-Ökonomie ohne Premium-Currency-Verwirrung — ein Verkaufsargument in Store-Reviews und Presse.
-
-### 2.3 Was wir bewusst NICHT bauen
-
-- **Kein Sweepstakes-/Redemption-Modell** (US-Verbotswelle 2025; Anhang C).
-- **Kein Cash-out, kein P2P-Handel** mit Marktwert (UK-Lizenzpflicht, „thing of value"-Risiko).
-- **Keine Energie-Drossel** à la Coin Master für den Slot-Core (passt nicht zur Session-Philosophie eines Casino-Produkts; Throttling übernimmt die Coin-Balance selbst).
-- **Keine Echtgeld-Brücke in der App** (Apple 5.3.3, § 5 GlüStV, Gateway-Kritik).
+- Gegen Fliff/Rebet: vollwertiges Meta (Liga, Bonus, Stadion, Clubs) statt reinem Sweepstakes-Sportsbook.
+- Gegen Social Casinos: Sport-Authentizität statt Slot-Ästhetik; ehrliche Ein-Währungs-Ökonomie.
+- **Nicht bauen:** kein Sweepstakes-/Redemption-Modell (US-Verbotswelle), kein Cash-out/Handel, keine Echtgeld-Brücke, **keine Energie-Drossel für den Kern-Loop** (Liga & Sportsbook sind coin-gedrosselt; die Freispiel-Bindung von Arena Spins ist zulässig, weil das Minigame bewusst *kein* Kern-Loop ist), keine kaufbaren Gewinnchancen-Ressourcen jeder Art (Freispiele, Free-Bets, Boosts).
 
 ---
 
-## 3. Produktvision & Spielsäulen
+## 3. Produktstruktur & Navigation
 
-Die App hat **vier Säulen**, erreichbar über eine Tab-Bar (+ zentraler Lobby-Hub):
+Fünf Bereiche über die Icon-Rail (Landscape-Chrome), Inhalte zweispaltig, Wettschein als Drawer:
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                        LOBBY (Home)                          │
-│   Bonus-Hub · Featured Slot · Nächste Spiele · Club-Feed     │
-├──────────────┬──────────────┬──────────────┬─────────────────┤
-│    SLOTS     │    SPORT     │     CLUB     │   ICH (Profil)  │
-│  Maschinen-  │  Pre-Match   │  Chat, Ziele │  Level, Stats,  │
-│  Galerie,    │  & Live,     │  Liga, Derby │  Album, Erfolge │
-│  Turniere    │  Tippspiele  │  Geschenke   │  Einstellungen  │
-└──────────────┴──────────────┴──────────────┴─────────────────┘
+┌──────┬────────────────────────────────────────────────┬ ─ ─ ─ ─ ┐
+│ RAIL │  HUD: Level·Rang · Freispiele · Coins          │ WETT-   │
+│ Lobby├────────────────────────────────────────────────┤ SCHEIN  │
+│ Sport│  LOBBY: Bonus-Hub · Tages-Tipp · Liga-Teaser · │ (Drawer)│
+│ Liga │         Arena Spins · Quick-Tipp · Challenges  │  Slider │
+│ Club │  SPORT: Live · Spieltag · Langzeit · C6 · Bets │  Einsatz│
+│ Ich  │  LIGA:  Spiel · Tabelle                        │  ≤ Cap  │
+│      │  CLUB:  Chest · Mitglieder(→Duell) · Chat      │         │
+│      │  ICH:   Statistiken · Stadion · Abzeichen · RG │         │
+└──────┴────────────────────────────────────────────────┴ ─ ─ ─ ─ ┘
 ```
 
-1. **Slots** — 6–8 Maschinen zum Launch (monatlich +1–2), gestaffelt nach Level; klassische Video-Slot-Features (Freispiele, Sticky Wilds, Multiplikatoren, Bonus-Minigames) plus 1–2 Signature-Maschinen mit Sport-Thema („Stadium Spins", „Champions Reels"), die es nur hier gibt.
-2. **Sport** — virtuelles Sportsbook mit echten Quoten (Feed des Betreibers), Einzel- & Kombiwetten, Live-Wetten, tägliche Pick-Challenges und ein wöchentliches „Super-6"-artiges Tippspiel als Gratis-Jackpot-Event.
-3. **Club** — bis 50 Mitglieder, Chat, gemeinsame Wochenziele, Club-Liga mit Auf-/Abstieg, Club-vs-Club-„Derby", Geschenk-Ökonomie, Mitglieder-Statistiken.
-4. **Profil/Meta** — Level & XP, Statistiken, Sammelalbum, Erfolge/Badges, Season-Fortschritt, Responsible-Gaming-Einstellungen.
-
-Die Lobby ist der Rhythmusgeber: Sie zeigt immer **den nächsten erreichbaren Vorteil** (Bonus in 42 Min · Club-Chest 78 % · Anstoß in 2 h · Daily Challenge 2/3) — der Spieler soll die App nie öffnen, ohne dass „gerade etwas geht".
+**Quick-Tipp** (Lobby): 1X2-Schnellauswahl an den Realspiel-Zeilen — legt die Auswahl direkt in den Wettschein. Die Lobby zeigt immer den nächsten erreichbaren Vorteil; in der Liga läuft immer gleich das nächste Spiel an.
 
 ---
 
-## 4. Zielgruppen & Spielertypen
+## 4. Zielgruppen & Segmentierung
 
-### 4.1 Zielgruppen
-
-| Persona | Beschreibung | Primär-Hook |
-|---|---|---|
-| **Der Sportfan** (Kernzielgruppe des Betreibers) | 21–45, männlich dominiert, verfolgt 1–2 Ligen intensiv, hat die Wett-App vielleicht schon | Live-Tippen ohne Risiko, Tippspiel gegen Freunde/Club, Spieltags-Events |
-| **Der Casual-Slot-Spieler** | 30–65, gemischt, spielt Slotomania/Coin Master-artige Apps in Wartezeiten | Slot-Loop, Bonus-Kadenz, Sammelalbum, Level-Fortschritt |
-| **Der Soziale** | Spielt wegen Menschen, nicht wegen Mechanik; Discord-/WhatsApp-Gruppen-Typ | Club-Chat, gemeinsame Ziele, Geschenke, Derby |
-| **Der Wettbewerbsspieler** | Leaderboard-getrieben, will messbar besser sein | Turniere, Ligen, Tipp-Statistiken (Trefferquote!), Badges |
-
-### 4.2 Spielertypen-Segmentierung (LiveOps)
-
-Ab Tag 1 werden Spieler nach Verhaltensachsen segmentiert (Anhang B, 4.5): **Spending** (Non-Payer/Minnow/Dolphin/Whale), **Engagement** (Daily/Weekend/Lapsed/Churned), **Affinität** (Slot-lastig / Sport-lastig / Social-lastig / Collector). Events, Offers und Push-Inhalte werden je Segment ausgespielt — z. B. bekommt ein Sport-lastiger Spieler am Freitag „Dein Tippschein für den Spieltag wartet", ein Collector „Nur noch 2 Karten bis Set-Abschluss".
+Wie v1 (Sportfan · Casual · Sozialer · Wettbewerbsspieler; Spending-/Engagement-/Affinitäts-Segmentierung), mit v3-Achse **Liga-lastig vs. Realsport-lastig**. Der Casual wird über die niederschwellige Liga geholt (tippen statt drehen), der Wettbewerbsspieler über Duelle und Trefferquoten-Identität.
 
 ---
 
-## 5. Core Loops
+## 5. Core Loops v3
 
-### 5.1 Minuten-Loop (Slots)
-
-```
-Coins einsetzen → Spin (Server entscheidet, Client zelebriert)
-→ Gewinn/Verlust + XP + Club-Punkte + Album-Drop-Chance
-→ Balance-Gefühl: „noch ein Spin"
-```
-
-Jeder Spin zahlt auf **vier Systeme gleichzeitig** ein: Kontostand, XP/Level, Club-Wochenziel, Sammelalbum. Das ist das wichtigste strukturelle Learning aus Huuuge/Coin Master: *Der Spieler soll nie nur für Coins spielen.* Selbst eine Verlust-Session erzeugt sichtbaren Fortschritt (Level-Balken, Club-Beitrag, Karten) — das entschärft Frust und trägt die Retention durch Downswings.
-
-### 5.2 Stunden-Loop (Bonus & Sport)
+### 5.1 Minuten-Loop — ARENA Liga
 
 ```
-3h-Bonus abholen → kurze Slot-/Wett-Session → Live-Spiel checken
-→ Wette settlen sehen → Challenge-Fortschritt → App schließen
-→ Push: „Bonus bereit" / „Anstoß in 30 Min" → Wiederkehr
+Anstoß-Countdown (~30 s) → Tipp (1X2/Ü-U, Coins, Slider ≤ Level-Cap)
+→ ~2,5 Min Live-Verlauf im Zeitraffer (Tore, Quoten-Drift, Suspendierung)
+→ Schlusspfiff → Sofort-Settlement: ±Coins, XP, Club-Punkte, Challenges
+→ nächstes Spiel → noch ein Tipp        [Zyklus gesamt ~3 Min]
 ```
+Jeder Einsatz zahlt auf vier Systeme ein (Kontostand, XP, Club, Challenges) — auch Verlust-Sessions erzeugen sichtbaren Fortschritt. Liga-Cash-out: Phase 2 (Kap. 9). *Demo-Artefakte laufen beschleunigt (~100-s-Zyklus).*
+
+### 5.2 Stunden-Loop — Bonus & Realsport
+
+3h-Bonus → Claim mündet in unmittelbaren Handlungs-Hook (Quick-Actions: Freispiele nutzen / zur Liga) → kurze Session → Live-Spiel/Settlement-Push → Wiederkehr.
 
 ### 5.3 Tages-Loop
 
-Daily Challenges (3 Slot- + 3 Sport-Aufgaben), Daily-Streak-Kalender, Club-Check-in (Chat, Geschenke), Tagesziel der Club-Chest.
+Daily Challenges (4 Aufgaben, einzeln gutgeschrieben + Tages-Chest) · **Tages-Tipp** (1 Gratis-Pick, Serien-Leiter) · Club-Check-in · Stadion-Fortschritt.
 
 ### 5.4 Wochen-Loop
 
-Club-Liga-Wertung (Mo–So), Wochen-Tippspiel (Deadline Samstag), Wochen-Chest (7-Tage-Streak), Turnier-Zyklen, Leaderboard-Reset.
+Club-Chest & Club-Liga (Mo–So) · Captain's Six (Deadline Spieltag) · **Wochenbogen** (7 Claim-Schlüssel → Wochen-Truhe) · Duell-Wochenbilanz.
 
-### 5.5 Season-Loop (6–8 Wochen)
+### 5.5 Season-Loop
 
-Season-Pass-artige Belohnungsleiste (nur mit Coins/Spielaktivität, kein Kauf-Pass — Ein-Währungs-Prinzip), saisonales Sammelalbum, Club-Season-Wertung mit Abschluss-Zeremonie, thematisch an den Sportkalender gekoppelt (Bundesliga-Rückrunde, Champions-League-K.o., WM/EM als Mega-Seasons).
+**Liga-Saisons** (2 Wochen, Tabellen-Reset + Zeremonie + Saison-Badges): **Phase 2**. Große Seasons (6–8 Wochen, Belohnungsleiste, Album, Sportkalender-Kopplung): **Phase 3**. Im MVP läuft die Liga-Tabelle fortlaufend ohne Reset.
 
 ---
 
-## 6. Coin-Ökonomie (Ein-Währungs-Modell)
+## 6. Coin-Ökonomie v3
 
 ### 6.1 Grundsätze
 
-1. **Coins haben keinen Realwert.** Kein Cash-out, kein Handel, keine Prämien mit Marktwert (rechtliche Grundlage der gesamten App, Kap. 17).
-2. **Spielen ist immer möglich.** Die Gratis-Coin-Pipeline garantiert, dass ein Spieler mit Balance 0 innerhalb von max. 3 h wieder auf Mindesteinsatz-Niveau ist — plus sofortige „Rettungsleine" (6.4). Das ist zugleich die wichtigste rechtliche Verteidigungslinie (Big-Fish-Urteil: Problem war „pay to continue").
-3. **Eine Währung, viele Fortschrittsachsen.** Was bei anderen die Premium-Währung leistet (Exklusivität, zweite Knappheit), leisten hier **nicht kaufbare** Statusachsen: XP/Level, Club-Punkte, Album-Karten, Badges, Liga-Ränge. Diese sind bewusst *nicht* gegen Coins tauschbar — sonst kollabieren sie in die eine Währung zurück.
+Wie v1 (kein Realwert; Spielen immer möglich — 24/7-Liga + Rettungsleine als Big-Fish-Verteidigung; nicht kaufbare Fortschrittsachsen). **Freispiele** sind eine getrennte Wallet-Ressource und tauchen in keinem Kaufangebot auf.
 
-### 6.2 Quellen (Faucets) und Senken (Sinks)
+### 6.2 Faucets & Sinks — und der ehrliche Befund
 
-| Quellen | Senken |
+> Werte in der Tabelle = **Level-1-Anker** der „Start klein → Millionär"-Skala (Start **1.000 Coins**). Alle Faucets wachsen mit **+11 %/Level** (Cap L55) über die Progression um ~1000× mit; der Max-Einsatz wächst mit **+16,5 %/Level** bewusst schneller.
+
+| Quellen (L1-Anker, wachsen mit Level) | Senken |
 |---|---|
-| Willkommenspaket (einmalig, groß — Benchmark Slotomania: 1 Mio.) | Slot-Einsätze (Haupt-Sink, RTP < 100 %) |
-| 3h-Bonus + Special Bonus (Kap. 8) | Sport-Einsätze (Overround wie beim echten Buchmacher, ~92–95 % Auszahlungsquote) |
-| Daily-Streak-Kalender | Turnier-Buy-ins (höhere Klassen) |
-| Level-up-Boni | Club-Gründung (einmalig) & optionale Club-Kosmetik |
-| Daily Challenges & Wochenziele | Kosmetik: Profilrahmen, Kartenhüllen, Jubel-Animationen, Club-Wappen |
-| Club-Chest, Liga-Preise, Derby-Preise | „Reroll" einer Daily Challenge |
-| Album-Set-Abschlüsse | Streak-Repair (verpassten Streak-Tag heilen) |
-| Geschenke von Clubmitgliedern | — |
-| Gewonnene Wetten & Slot-Gewinne (Rückfluss) | — |
-| Coin-Käufe (IAP) | — |
+| Willkommenspaket **1.000** (einmalig) | **Liga-Hold: 7,5 % des Liga-Einsatzes** (Auszahlungsfaktor 0,925; Overround 8,1 % ist die Quoten-, nicht die Umsatzgröße) |
+| Arena Bonus (3h): Basis **60 × 1,11^(min(L,55)−1)** × Multiplikator (Cap ×2,0) | Realsport-Hold (~5–8 %, spieltagsgebunden) |
+| Special-Rad jeder 3. Claim: **EV ≈ 3 × Claim-Betrag** (Segmente 2/3/5/8/25×) **+ Ø 1,79 Freispiele + 0,21 Karten je Dreh** | **Stadion:** Stufe n kostet 250 × 2^(n−1) (Vollausbau ~15 T) — bewusst früh abschließbarer Meilenstein; echte Wealth-Sinks (s. u.) in Phase 2 |
+| +2 Freispiele je Claim (EV je Freispiel ≈ 0,24 × Bonus-Basis; Tages-EV ≤ 10–15 % des Budgets) | **Duell-Rake 5 %** des Pots |
+| Tages-Tipp: **40** × min(Serie, 10) je Treffer (level-skaliert) | **Club-Gründung: 500** (einmalig, ab L20) |
+| Daily Challenges 4 × **35–50** + Tages-Chest **120** (level-skaliert) | Turnier-Buy-ins + 10–15 % Rake (Phase 2) |
+| Level-up: **300 × 1,11^(min(L,55)−1)** + 3 Freispiele | Kosmetik · Challenge-Reroll · Streak-Repair (1×/Woche) |
+| C6-Preise · Club-Ausschüttungen · Geschenke (Empfangs-Cap/Tag) | — |
+| Wett-/Duell-Gewinne (Rückfluss) · IAP | — |
 
-**Design-Regel:** Netto (Faucets − Sinks) muss für den engagierten Non-Payer leicht negativ sein — genug, um täglich auf komfortablem Einsatzniveau zu spielen, aber nicht genug, um dauerhaft auf dem Maximaleinsatz seines Levels zu bleiben. Der Abstand zwischen „komfortabel" und „maximal" ist der Monetarisierungsraum. **Wichtig (Playtika-Lehre 2025):** Diese Schraube nach Launch nur in kleinen, getesteten Schritten drehen — ein hartes nachträgliches Rebalancing hat Slotomania fast die Hälfte des Umsatzes gekostet.
+**Referenz-Burn:** skaliert mit dem Level (Einsatz × Tipps × 7,5 % Hold). Weil der Max-Einsatz schneller wächst als die Faucets, holt der Burn mit steigendem Level auf ⇒ die Balance klettert erst stark und plateaut dann in den Millionen (s. Trajektorie unten).
 
-### 6.3 Inflationskontrolle
+> **Befund (Review, bestätigt):** Die ursprünglichen Demo-Belohnungswerte verletzten die Design-Regel massiv; **die Monte-Carlo-Simulation (13.07.2026, `arena-economy-sim/`) hat es quantifiziert:** engagierter Non-Payer Faucet/Burn **36,7×**, Balance nach 90 Tagen ~15 **Milliarden**, Level-Cap in Wochen. Größte Faucets: **Challenges/Chest 40 %, Bonus-Rad 23 %** (der Bonus selbst nur 18 %). Ursachen strukturell: exponentielles Faucet-Wachstum (1,10^Level) + Runaway-Leveling (XP = voller Turnover).
 
-Ein-Währungs-Systeme neigen zu Hyperinflation der Zahlen (Slotomania zahlt inzwischen Millionen als Kleinstbonus). Gegenmaßnahmen:
+> **Zwischenschritt (verworfen):** Ein erster Fix (Bonus +5 %/L40, Rad-EV 3×, Challenges halbiert, Start weiter 1 Mio) bändigte zwar die Inflation (d90 ~23 Mio statt 15 Mrd.), lieferte aber kein **Progressionsgefühl** — man startet als „Millionär" und bleibt einer.
 
-- **Einsatz-Progression als impliziter Sink:** Höhere Level schalten höhere Einsätze frei; die Bonus-Skalierung wächst *langsamer* als der freigeschaltete Maximaleinsatz (z. B. Bonus × 1,12 pro Levelband, Max-Bet × 1,25) — Reichtum bleibt relativ.
-- **Kosmetik-Senken** mit reinen Prestige-Preisen für reiche Non-Payer.
-- **Turnier-Klassen nach Balance/Level** (Bronze/Silber/Gold-Buy-ins), damit große Balances einen sinnvollen Verwendungszweck haben.
-- **Zahlendarstellung** von Anfang an mit Kurzform (1,2 Mio · 3,4 Mrd) und ohne UI-Layout, das an Ziffernbreite hängt.
+> **Finales Design „Start klein → Millionär" (umgesetzt 13.07., App + POC + Sim):** Start **1.000 Coins**; alle Faucets +11 %/Level (Cap L55), Max-Einsatz +16,5 %/Level. Zusätzlich **XP von Coins entkoppelt** → Leveln nach **Aktivität** (feste Punkte je Handlung), nicht nach Einsatzhöhe. Das war nötig (bei kleinen Coins würde einsatzbasierte XP das Leveln blockieren) und beseitigt zugleich das alte Leveling-Runaway. Validiert (`arena-economy-sim/tune_startsmall.py`): engagierter Non-Payer klettert **1.000 → 1 Mio um Tag ~60 (Woche 8–9)** → mehrere Mio im 3. Monat; Level-Pacing **L8 ~Tag 4, L20 ~Tag 20, L50 ~Tag 100**; Heavy-User (Liga-Junkie/Whale) bei Ratio **~1,2–1,5×** (Kaufdruck). Bestehende Prototyp-Stände werden per Schema-Version einmalig auf die neue Skala zurückgesetzt.
 
-### 6.4 Sicherheitsnetz („Rettungsleine")
+> **Design-Ziel (präzisiert):** „Faucet ≈ Burn" ist als Kennzahl verworfen. Steuergrößen sind jetzt: (1) **Progressions-Trajektorie** — Zielsegment erreicht „1 Mio" in einem definierten Korridor (Woche 6–10), danach **Plateau** statt Weiterwuchern (getragen vom schneller wachsenden Max-Einsatz + Wealth-Sinks) · (2) **Netto-Druck bei Heavy-Usern** (Ratio ~1) · (3) **Wealth-Sinks** für den Millionen-Bereich (Kosmetik, Turnier-Buy-ins, höhere Stadionstufen — Phase 2), weil das level-skalierte Stadion allein den High-Level-Sink nicht mehr trägt. Feinjustierung final per Soft-Launch-A/B mit Holdout. Dashboard/KPIs (Kap. 21) entsprechend.
 
-Fällt die Balance unter den Mindesteinsatz des niedrigsten Slots, erscheint einmalig pro X Stunden ein „Comeback-Bonus" (kleiner Coin-Betrag + 10 Gratis-Spins auf einer Starter-Maschine). Zweck: (a) rechtliche Absicherung („weiterspielen nie kaufpflichtig"), (b) Frust-Churn-Prävention, (c) bewusst klein genug, um Kaufanreiz nicht zu zerstören.
+### 6.3 Multiplikator-Budget
+
+Bonus-Multiplikatoren: Bonus-Serie ×1,07 (Tag 1) → ×1,49 (Tag 7+) · Stadion bis ×1,30 · Club-Liga-Division +2 %/Division (Phase 2). **Gesamt-Cap ×2,0.** Der Status-Rang ist in v3 bewusst **kein** Bonus-Multiplikator (Abweichung von v1, s. Änderungsprotokoll).
+
+### 6.4 Inflationskontrolle
+
+Einsatz-Progression als impliziter Sink (Max-Einsatz wächst schneller als Bonus-Basis) · statistische Undichtheit des Sport-Holds (Strähnen) wird durch den hochfrequenten, exakt kalibrierten Liga-Hold + Stadion + Rake aufgefangen · Geschenk-Empfangs-Cap · Kurzform-Zahlen ab Tag 1.
+
+### 6.5 Rettungsleine
+
+Trigger: Balance < 5.000 (Mindesteinsatz). Inhalt: 2–3 Mindesteinsätze + 5–10 Freispiele. Kadenz: alle **6 Stunden** (Remote-Config-Parameter), Missbrauchs-Pacing für Serien-Buster. Durch die 24/7-Liga gilt „binnen Minuten wieder spielfähig".
+
+### 6.6 Kalibrier-Invariante der ARENA Liga (ökonomiekritisch — implementiert & verifiziert)
+
+**Quoten werden exakt aus dem Simulationsmodell abgeleitet** (Tore ~ Poisson(λ · Restzeit) mit λ ≈ 2,685, Heimanteil q aus Teamstärken; Ausgangswahrscheinlichkeiten per Poisson-Splitting über Endstände; Quote = 0,925/p). Damit ist der EV je Markt konstruktionsbedingt −7,5 % (modulo Rundung/Clamps). **Preisheuristiken sind verboten.** Status: In beiden Prototypen seit 12.07.2026 exakt implementiert und per Monte-Carlo verifiziert (400.000 Simulationen je Konstellation: EV aller Märkte −7,0 % bis −8,0 %). Im Produkt ist diese Prüfung ein **CI-Test der Liga-Engine**; dazu auditierbarer RNG und deterministische Replays je Spiel (Seed + Modellversion).
 
 ---
 
-## 7. Leveling & Progression
+## 7. Leveling, Einsätze & Progression
 
-### 7.1 XP-Formel (Kundenvorgabe: Mischung aus Einsatz und Gewinn)
+### 7.1 XP-Formel
 
 ```
-XP pro Slot-Spin     = 1,0 × Einsatz + 0,25 × Nettogewinn (gedeckelt bei 5 × Einsatz)
-XP pro Sportwette    = 1,2 × Einsatz (bei Settlement) + 0,25 × Nettogewinn (gedeckelt bei 5 × Einsatz)
-                       Live-Wetten: Einsatz-Anteil × 1,5 (Anreiz für das Differenzierungs-Feature)
-XP aus Challenges    = Festbeträge (levelskaliert), ~10–20 % des Tages-XP eines aktiven Spielers
+XP = (1,0 × Einsatz + 0,25 × Nettogewinn[Gewinnanteil ≤ 5 × Einsatz]) × Mult
+Mult: Realsport 1,2 · Live 1,5 · Liga 1,0 · Duell 1,0
+Fest-XP: Freispiel-Spin 1.500 · Tages-Tipp-Treffer 10.000 · C6 20.000 · Stadion Kosten/20
+FTUE-Fest-XP: geführte Onboarding-Schritte geben Fest-XP (Stellschraube fürs D0-Pacing, Kap. 14)
 ```
+Exploit-Schutz wie v1 + Liga-XP-Tagesvolumen-Cap.
 
-**Warum gedeckelter Gewinnanteil:** Reines Einsatz-XP (Slotomania) belohnt stumpfes Durchklicken; reines Gewinn-XP wäre Varianz-Lotterie und bei Sportwetten manipulierbar (Quoten nahe 1,01 spammen). Die Mischung honoriert *Erfolg spürbar* („mein Big Win hat mich fast ein Level gebracht!"), ohne dass ein einzelner Jackpot die Progression sprengt (Cap) und ohne dass Verlieren sich wie Stillstand anfühlt (Einsatz-Basis). Der Sport-Multiplikator 1,2 gleicht aus, dass Wetten seltener und langsamer settlen als Spins.
+### 7.2 Levelkurve, Pacing & Freischaltungen
 
-**Exploit-Schutz:** XP nur auf settled Bets (kein Cash-out-Farming); pro Event & Markt gedeckeltes XP-Volumen; Minimalquote (z. B. 1,20) für XP-Anrechnung bei Sportwetten; serverseitige Anomalie-Erkennung (Kap. 18.4).
+Kurve: 20.000 × Level^1,35. **Pacing (rechnerisch geprüft):** Session 1 → Level 3–4 (per FTUE-Fest-XP auf 4 hebbar); Tag 2–4 → Level 8; Level 20 ≈ Woche 2–3; **Level 50 nach ~2–3 Monaten** (Liga-Volumen-abhängig — Simulation kalibriert). **Meilenstein-Level 25/50/100:** großes Paket + permanentes Badge + Club-Broadcast (soziale Sichtbarkeit, aus v1 übernommen).
 
-### 7.2 Levelkurve & Freischaltungen
-
-- **Endlos-Progression** mit sanft exponentieller Kurve (Level n → n+1 kostet ~8–12 % mehr XP); erste 10 Level in der ersten Session erreichbar (Onboarding-Dopamin), Level 50 nach ~2–3 Wochen aktiven Spielens, ab Level 100 Prestige-Territorium.
-- Jedes Level: sofortiger **Level-up-Coin-Bonus** (skalierend) + kleine Konfetti-Zeremonie.
-- Freischaltungen nach Levelbändern:
-
-| Level | Freischaltung |
-|---|---|
-| 1 | Starter-Slot, Sport-Tab (Einzelwetten), 3h-Bonus |
-| 3 | Daily Challenges |
-| 5 | Zweiter Slot, Kombiwetten (2er) |
-| 8 | **Club-Beitritt** (bewusst früh — sozialer Lock-in ist der stärkste Retention-Hebel) |
-| 10 | Sammelalbum, Live-Wetten |
-| 12+ | Alle 3–6 Level: neue Slots, höhere Max-Einsätze, größere Kombis, Turnier-Klassen, Kosmetik-Slots |
-| 20 | Club-Gründung, Wochen-Tippspiel „Captain's Six" |
-| 30+ | High-Roller-Lounge (eigener Lobby-Bereich), exklusive Maschinen-Varianten |
-
-- **Meilenstein-Level** (25/50/100/…): großes Paket + permanentes Profil-Badge + Club-Broadcast („Max hat Level 50 erreicht!") — Level-Aufstiege sind sozial sichtbar.
-
-### 7.3 Status-Track (nicht kaufbar)
-
-Parallel zum Level ein **Saison-Statusrang** (Bronze → Silber → Gold → Platin → Diamant), gespeist aus *Aktivität* (XP der laufenden Season), nicht aus Käufen. Status hebt Bonus-Multiplikatoren (Kap. 8) und Geschenk-Limits. Saisonaler Soft-Reset (ein Band runter pro Season) hält den Rang bedeutsam. Damit existiert die VIP-Logik von Slotomania — aber aktivitäts- statt ausgabenbasiert, was zum Ein-Währungs-Modell und zur RG-Haltung (Kap. 16) passt. *(Option für später: ein separates, diskretes Ausgaben-basiertes VIP-Care-Programm für Top-Spender außerhalb der Spiel-UI.)*
-
----
-
-## 8. Das Bonus-System
-
-Das Herzstück der Retention-Mechanik — die Kundenidee (3h-Bonus, jeder 3. Claim ein Special Bonus, levelskalierend, animiert) wird hier zum vollständigen System ausgebaut.
-
-### 8.1 Der 3-Stunden-Bonus („Arena Bonus")
-
-- **Takt:** Alle 3 Stunden abholbar (max. 8 Fenster/Tag, realistisch 3–5 Claims bei aktiven Spielern — deckt sich mit Slotomanias 3–4h-Benchmark).
-- **Akkumulation statt Verfall:** Wird der Bonus nicht abgeholt, wächst er weiter bis zur Kappung bei **6 Stunden (= 1,5 Fenster-Wert)**. Learning aus Jackpot Party/DoubleDown: Verfall bestraft und frustriert, Akkumulation belohnt Wiederkehr *und* verzeiht Schlaf/Arbeit. Push-Notification beim Erreichen der Kappung („Dein Bonus ist voll — hol ihn ab!").
-- **Höhe:** `Basis(Levelband) × Statusmultiplikator × Streak-Multiplikator`
-  - Basis wächst mit dem Levelband (z. B. +12 % pro Band, siehe Inflationsregel 6.3).
-  - Status (Kap. 7.3): Bronze ×1,0 → Diamant ×1,6.
-  - Tages-Streak (s. u.): bis ×1,5.
-- **Claim-Erlebnis:** Kein stummer „+5.000"-Toast, sondern ein 3–4-Sekunden-Moment: Der Bonus-Button (permanent in der Lobby, mit Countdown-Ring) platzt auf, Coins fliegen physikbasiert in den Kontostand, der Zähler tickt hörbar hoch, Haptic-Feedback (`UIImpactFeedbackGenerator`), dezenter Sound. Überspringbar per Tap (Vielspieler-Respekt).
-
-### 8.2 Der Special Bonus (jeder 3. Claim)
-
-- **Mechanik:** Ein sichtbarer **3-Segment-Ring** um den Bonus-Button füllt sich pro Claim. Beim 3. Claim wird kein normaler Bonus ausgeschüttet, sondern das **Bonus-Rad** gestartet — ein Vollbild-Minigame (Glücksrad im Stadion-Design, Konfetti, Spotlights, Crowd-Sound).
-- **Rad-Inhalte (levelskalierend):**
-  - Coin-Beträge: 3×, 5×, 8×, 12×, 20× des normalen Bonus (gewichtete Wahrscheinlichkeiten; Erwartungswert ≈ 5× normaler Bonus)
-  - 1 Album-Kartenpaket
-  - 10–25 Gratis-Spins auf der „Maschine der Woche"
-  - 1 **Free-Bet-Token** (Sportwette ohne Coin-Einsatz, Gewinn zählt — brückt Slot-Spieler ins Sportsbook!)
-  - Jackpot-Segment (klein, selten): 50× Bonus + Club-Broadcast
-- **Warum das funktioniert:** Der 3er-Zähler verwandelt drei einzelne Claims in eine *Serie mit Ziel* (Zeigarnik-Effekt: angefangene Ringe will man vollmachen). Der Special Bonus ist zudem der geplante tägliche „Wow-Moment" — ein aktiver Spieler erlebt ihn 1–2× am Tag.
-- **Der Zähler verfällt nie** (auch nicht über Nacht) — sonst wird aus Vorfreude Bestrafung.
-
-### 8.3 Tages-Streak & Wochenbogen
-
-- **Streak-Definition:** Mindestens 1 Bonus-Claim pro Kalendertag.
-- **Effekt:** Streak-Multiplikator auf den Arena Bonus: Tag 1 ×1,0 → Tag 7+ ×1,5 (Anzeige als Flammen-Icon mit Tageszähler).
-- **Wochenbogen (Jackpot-Party-Muster):** Jeder Tag mit Claim gibt 1 **Schlüssel**; 7 Schlüssel öffnen samstags/sonntags die **Wochen-Truhe** (großes Coin-Paket + garantiertes seltenes Kartenpaket + Kosmetik-Chance).
-- **Streak-Repair:** Ein verpasster Tag kann binnen 48 h für Coins „geheilt" werden (Sink + Frust-Prävention). Maximal 1 Repair/Woche.
-
-### 8.4 Weitere Bonusquellen (bewusst schlanke Liste)
-
-Slotomania streut ein Dutzend Bonus-Typen — für den Launch gilt: **wenige, dafür klar verstandene Quellen** (Arena Bonus, Special Bonus, Daily Streak, Wochen-Truhe, Challenges, Club). Mehr Bonusarten (Lotto, Store-Bonus, E-Mail-Boni) sind LiveOps-Optionen für spätere Frische, nicht Launch-Umfang. Ein überladenes Bonus-Menü verwässert die Appointment-Wirkung jedes einzelnen.
-
----
-
-## 9. Clubs — das soziale Rückgrat
-
-Referenzmodelle: Huuuge/Billionaire (Struktur, Liga), Coin Master (Teams, Requests), Cash Frenzy (Koop-Chest), Clash of Clans (Identität, Rollen). Kernprinzip aus Anhang B: **Beitrag entsteht durch normales Spielen** — es gibt keinen separaten „Club-Grind".
-
-### 9.1 Struktur
-
-- **Größe:** max. 50 Mitglieder. Beitritt ab Level 8, Gründung ab Level 20 (+ Coin-Gebühr als Sink).
-- **Typen:** Offen / Auf Anfrage / Nur Einladung. Suchfilter: Sprache, Liga-Rang, Aktivitätslevel, „Lieblingsverein" (Sport-Identität!).
-- **Rollen:** Leader, 2 Co-Leader, Elder, Member — mit Kick-/Invite-/Broadcast-Rechten (CoC-Modell).
-- **Club-Level:** steigt durch Gesamtaktivität; schaltet Member-Cap-Stufen (30→40→50), Wappen-Kosmetik und Derby-Teilnahme frei.
-- **Club-Chat:** Textnachrichten, Emotes/Sticker, Systemkarten (Big Wins, Level-Ups, Wett-Erfolge, „X braucht Karte Y"), angepinnte Ansagen. Moderation: Melden, Blockieren, serverseitige Filter (Kap. 18.5).
-
-### 9.2 Drei Ebenen des Club-Wettbewerbs
-
-1. **Club-Chest (Koop, wöchentlich):** Alle Einsätze der Mitglieder füllen eine gemeinsame Truhe mit 6 Meilenstufen (Cash-Frenzy-Muster). Jede Stufe schüttet an **alle** aus — auch an Schwächere (Inklusion). Fortschrittsbalken prominent im Club-Tab und in der Lobby.
-2. **Club-Liga (kompetitiv, wöchentlich):** Clubs werden in 20er-Gruppen gematcht; Wertung = Club-Punkte (1 Punkt je X eingesetzte Coins, Slots und Sport zählen). Ligen Bronze → Master mit Auf-/Abstieg (Billionaire-League-Muster). Liga-Rang gibt permanenten **Bonus-Multiplikator** für alle Mitglieder (+2 % pro Liga-Stufe auf den Arena Bonus) — der Club zahlt buchstäblich auf das Bonus-System ein, dadurch verzahnen sich Kap. 8 und 9.
-3. **Das Derby (Club vs. Club, alle 2 Wochen):** 1-gegen-1-Match zweier Clubs über ein Wochenende, thematisch an echte Sport-Topspiele gekoppelt („Derby-Wochenende"). Punkte aus Slot-Aktivität + korrekten Sport-Picks. Gated ab Club-Level X (Huuuge-Conquest-Muster: Exklusivität als Statusanreiz). Sieger-Club: großer Preis + Wappen-Rahmen für 2 Wochen.
-
-### 9.3 Geschenk- & Hilfe-Ökonomie
-
-- **Tägliches Geschenk:** Jedes Mitglied kann 1×/Tag ein Coin-Geschenk an den Club senden (kostet den Sender nichts, Empfänger erhalten levelskalierten Betrag — Bingo-Blitz-Gift-Center-Muster: Geben ist gratis, Nehmen ist wertvoll, Freundschaft wird ökonomisch spürbar).
-- **Karten-Requests:** „Ich brauche Karte X" → Mitglieder mit Duplikaten können sie mit einem Tap spenden (Coin-Master-Muster). **Wichtig:** Nur Duplikat-Spenden auf Anfrage, kein freier Handel (Regulatorik, Kap. 17).
-- **Jubel-Momente:** Big Wins und gewonnene Hochquoten-Wetten erscheinen als Karte im Chat mit „Glückwunsch"-Reaktions-Button (sendet Mini-Coin-Regen zurück an den Gratulanten — positive Feedback-Schleife).
-
-### 9.4 Mitglieder-Statistiken (Kundenwunsch)
-
-Im Club-Tab pro Mitglied sichtbar (Woche/Season): Club-Punkte-Beitrag, Einsätze, größter Gewinn, Tipp-Trefferquote, Derby-Punkte, Aktivitäts-Ampel (heute/diese Woche aktiv). Sortierbare Tabelle → sozialer Druck & Anerkennung; Grundlage für Kick-Entscheidungen inaktiver Mitglieder (CoC-Dynamik). Details Kap. 12.
-
----
-
-## 10. Virtuelles Sportsbook & Live-Wetten
-
-### 10.1 Angebot
-
-- **Quellen:** Odds- und Ergebnis-Feed des Betreibers (bzw. Sportradar/Betradar-Vertrag auf F2P-Nutzung erweitern — Lizenzpunkt früh klären, Anhang C).
-- **Märkte (bewusst kuratiert, nicht der volle Buchmacher-Katalog):** 1X2/Moneyline, Über/Unter, Handicap, Beide treffen, Ergebnis; Top-Ligen Fußball + je nach Markt NBA/NFL/Tennis/eSports. Kuratierung hält die UX spielerisch statt „Trading-Terminal".
-- **Wettarten:** Einzel, Kombi (2er ab Level 5, größere mit Level), System später.
-- **Live-Wetten (ab Level 10):** Live-Quoten auf laufende Spiele, Cash-out-Funktion (in Coins) als Spannungs-Feature. Live-Einsätze geben 1,5× XP (Kap. 7.1) — Live ist das Feature, das kein Social Casino hat, also wird es progressionsseitig gefördert.
-- **Settlement-Erlebnis:** Gewonnene Wetten werden zelebriert (Push „Dein Tipp ist durch! +48.000 Coins" + Animation beim nächsten App-Start); der Wettschein-Verlauf ist ein eigener kleiner Feed.
-
-### 10.2 Tägliche Pick-Challenges (Fliff-Muster)
-
-Täglich 5 kuratierte Aufgaben („Tippe ein Spiel der Premier League", „Platziere einen 2er-Kombi", „Gewinne eine Live-Wette") → je XP + Coins; alle 5 = Tagesbonus. Erzeugt Wett-Routine auch an Tagen ohne „eigenes" Spiel.
-
-### 10.3 „Captain's Six" — das Wochen-Tippspiel (Sky-Bet-Super-6-Muster)
-
-- Kostenlos, 1 Tipp-Set pro Woche: 6 Spielausgänge des Top-Spieltags.
-- **6/6 richtig = Community-Jackpot** (riesiger Coin-Betrag, wird bei Nichtgewinn progressiv größer — dauerhafter Gesprächsstoff); Teilpreise ab 4/6.
-- **Club-Wertung:** Durchschnittspunkte der Mitglieder fließen als Bonus in die Club-Liga → das Tippspiel wird zum wöchentlichen Club-Ritual („Habt ihr alle getippt?!").
-- Deadline-Push am Samstagvormittag = zuverlässiger wöchentlicher Re-Engagement-Anker mit *externem* Grund.
-
-### 10.4 Social Betting
-
-- **Tipp teilen:** Jeden Wettschein in den Club-Chat posten; Mitglieder können mit einem Tap **mitgehen** („Copy-Bet" mit eigenem Einsatz — Rebet-Muster).
-- **Tipp-Duell:** Direkte 1-gegen-1-Challenge („Ich sage Bayern, du sagst Dortmund — 50.000 Coins?") mit Escrow durch den Server. *(Hinweis: kein P2P-Coin-Transfer im freien Sinne — beide Einsätze gehen in einen Pot, der Server settlet; rechtlich als Spielmechanik gestaltet, nicht als Überweisung.)*
-- **Leaderboards:** Wöchentlich pro Sportart: höchste Trefferquote (min. N Wetten), höchster Multi-Gewinn, Club-interne Tipp-Tabelle.
-
-### 10.5 Abgrenzung zum Echtgeld-Produkt (kritisch)
-
-**In der App gibt es keinerlei Hinweis, Link oder CTA zum Echtgeld-Sportsbook.** Kein „Jetzt echt wetten", keine geteilten Accounts mit Echtgeld-Guthaben, keine Odds-Deep-Links in die Wett-App. Gründe: Apple 5.3.3 (IAP-Währung darf nicht mit RMG verknüpft sein), § 5 GlüStV (Kap. 17), Gateway-/Reputationsrisiko (Kap. 16). Der strategische Wert für den Betreiber entsteht indirekt: Markenbindung, First-Party-Daten (mit Consent), Engagement-Ökosystem — nicht durch In-App-Konversion.
-
----
-
-## 11. Challenges, Events, Seasons & LiveOps
-
-### 11.1 Daily Challenges
-
-- 3 Slot- + 3 Sport-Aufgaben täglich (levelskaliert generiert), z. B. „300 Spins auf beliebiger Maschine", „Triff 3 Freispiel-Trigger", „Gewinne 2 Wetten mit Quote ≥ 1,5".
-- Alle 6 = Tages-Chest. 1 Reroll/Tag gegen Coins (Sink).
-- Challenge-Fortschritt läuft passiv beim normalen Spielen mit (kein „Questlog-Gefühl").
-
-### 11.2 Sammelalbum („ARENA-Album", SlotoCards-Muster)
-
-- Pro Season ein Album mit ~15 Sets à 9 Karten (Themen: Stadien, Legenden-Archetypen, Maskottchen — Vorsicht: keine echten Spielernamen ohne Lizenz).
-- Karten droppen aus Spins (wahrscheinlichkeitsbasiert, einsatzskaliert), Wetten-Settlements, Special Bonus, Chests.
-- Set-Abschluss: eskalierende Coin-Pakete + Kosmetik; Album-Abschluss: Mega-Preis + permanentes Badge.
-- Duplikate: an Clubmitglieder auf Anfrage spendbar (9.3) oder im „Recycler" gegen Punkte für ein Bonus-Rad einlösbar.
-- **Club-Album-Twist (Slotomania-Clan-Album):** 1 gemeinsames Club-Set pro Season, bei dem jede von *irgendeinem* Mitglied gezogene Club-Karte allen gehört.
-
-### 11.3 Turniere
-
-- **Blitz-Turniere (Tournamania-Muster):** 20–30 Min., automatische Einschreibung beim Spielen einer markierten Maschine, Live-Leaderboard (Punkte = Gewinne relativ zum Einsatz — nicht absolut, sonst gewinnen immer High-Roller), Top-N-Preise.
-- **Klassen nach Levelband/Buy-in** (Bronze/Silber/Gold), damit Anfänger reale Gewinnchancen haben und große Balances einen Sink finden.
-- **Wochenend-Specials:** thematisch an Sport-Events gekoppelt („Champions-Turnier am CL-Abend").
-
-### 11.4 Seasons (6–8 Wochen)
-
-- **Gratis-Belohnungsleiste** (kein Kauf-Pass): Season-Punkte aus XP, Challenges, Tippspiel, Derby → 40–50 Stufen mit Coins, Kartenpaketen, Kosmetik, Free-Bet-Tokens; 3 große Meilenstein-Momente.
-- Saisonthema an Sportkalender gekoppelt; **WM/EM/große Turniere = Mega-Seasons** mit eigenem Album, eigenem Tippspiel-Modus (Bracket!), Sonder-Slot-Skin.
-- Season-Ende: Abschluss-Zeremonie (persönliche Statistik-Story im Instagram-Story-Format — teilbar, organische Akquise).
-
-### 11.5 LiveOps-Kadenz (Ziel-Rhythmus nach Launch)
-
-| Rhythmus | Inhalt |
-|---|---|
-| Täglich | Challenges, Bonus-Zyklen, „Maschine des Tages" (XP-Boost) |
-| Wöchentlich | Club-Liga, Club-Chest, Captain's Six, Turnier-Zyklus, Wochen-Truhe |
-| 2-wöchentlich | Derby, neues Event-Feature im A/B-Test |
-| Monatlich | Neue Slot-Maschine, Kosmetik-Drop |
-| 6–8 Wochen | Season-Wechsel, neues Album |
-| Ad hoc | Sport-Großereignisse, Flash-Events, Personalisierte Offers |
-
-Alles remote konfigurierbar (Kap. 18.3) — **kein App-Release für Event-Änderungen**.
-
----
-
-## 12. Statistiken, Leaderboards & Profile
-
-Statistiken sind bei Sportfans kein Beiwerk, sondern Kernmotivation (Fantasy-Sports-Lehre). Drei Ebenen:
-
-1. **Ich:** Level, XP-Verlauf, Lieblingsmaschine, größter Win, Slot-RTP-Verlauf („Glücks-Barometer"), Wett-Trefferquote gesamt/pro Liga/pro Markt, Kombi-Statistik, Streak-Rekorde, Badges. Teilbare „Stat-Cards" (Bild-Export).
-2. **Club:** Mitglieder-Tabelle (9.4), Club-Historie (Liga-Verlauf, Derby-Bilanz), Hall of Fame (Rekorde: größter Win aller Zeiten, beste Tipp-Woche …).
-3. **Global/Freunde:** Wochen-Leaderboards (Tipp-Trefferquote, Turnierpunkte, Album-Fortschritt) mit Freunde-Filter; bewusst **wöchentlich resettet** — ewige Bestenlisten demotivieren Neueinsteiger.
-
-**Design-Grundsatz:** Öffentliche Vergleiche zeigen *relative* Kennzahlen (Trefferquote, Punkte), nicht absolute Coin-Bestände — schützt vor „Pay-to-Flex"-Optik und hält Leaderboards für Non-Payer gewinnbar.
-
----
-
-## 13. Retention-Architektur
-
-### 13.1 Der ideale Tag eines Spielers (Ziel: 3–5 Sessions)
-
-```
-07:30  Push: „Dein Bonus ist voll" → Claim (Streak +1, Ring 1/3)
-       → 5 Min Slots, Daily Challenges starten
-12:30  Lunch-Session: Bonus-Claim (2/3), Pick-Challenge des Tages,
-       Club-Chat checken, Geschenk senden
-17:00  Push: „Anstoß in 60 Min — dein Live-Tipp wartet"
-20:15  Abend-Session (Hauptsession): Bonus-Claim → SPECIAL BONUS (Rad!),
-       Live-Wetten parallel zum Spiel, Slots in der Halbzeit,
-       Club-Chest-Stufe erreicht
-22:30  Wett-Settlement-Push: „+120.000 Coins — dein Tipp saß!"
-       → kurzer Claim-Besuch, morgen weiter
-```
-
-### 13.2 Retention-Hebel nach Zeithorizont
-
-| Horizont | Hebel |
-|---|---|
-| D0 (FTUE) | Großes Willkommenspaket, erster Big-Win-Moment in Minute 1–2 (getunte Starter-Maschine), Level 1→5 in Session 1, Bonus-System + Sport-Tab im Tutorial verankert (Slotomania-Lehre: Meta-Features ins FTUE) |
-| D1–D7 | Tages-Streak & Wochenbogen, Daily Challenges, erste Club-Einladung (Level 8 ≈ Tag 2–3), erstes Captain's Six |
-| D7–D30 | Club-Bindung (Liga, Chest, Chat), Album-Sets, Status-Rang, Turnier-Routine |
-| D30+ | Season-Zyklen, Derby-Rivalitäten, Sammler-Vervollständigung, Sportkalender (der beste D30+-Hebel: die Rückrunde kommt von allein), soziale Verpflichtung gegenüber dem Club |
-| Lapsed | Comeback-Paket (gestaffelt nach Abwesenheit), „Dein Club vermisst dich"-Push (nur mit echtem Club-Kontext), Saisonstart-Reaktivierung („Die neue Saison beginnt — dein Rang wartet") |
-
-### 13.3 Warum das langfristig trägt (die Kundenfrage)
-
-Langfrist-Retention entsteht nicht aus einem Feature, sondern aus **überlappenden Verpflichtungs- und Vorfreude-Schleifen**, die nie gleichzeitig „fertig" sind:
-
-1. **Zeitliche Anker** (3h-Bonus, Streak, Wochen-Truhe) — *Gewohnheit*.
-2. **Externe Anker** (Spieltage, Live-Spiele, Saisonkalender) — *Anlass ohne Design-Aufwand*; das Alleinstellungsmerkmal gegenüber jedem reinen Social Casino.
-3. **Soziale Verpflichtung** (Club-Chest braucht mich, Derby-Wochenende, Chat-Beziehungen) — *der stärkste Churn-Schutz überhaupt*; Spieler verlassen Spiele, aber ungern Menschen.
-4. **Unabgeschlossene Sammlungen** (Album 87 %, Ring 2/3, Season-Stufe 34/40) — *Zeigarnik-Effekt*.
-5. **Identität & Status** (Level, Rang, Badges, Tipp-Trefferquote als Stolz-Metrik) — *versunkene Identität, nicht nur versunkene Kosten*.
-6. **Frische durch LiveOps** (Kadenz 11.5) — *es gibt immer etwas Neues, ohne dass der Kern sich ändert*.
-
----
-
-## 14. UX, Animationen & Game Feel
-
-### 14.1 Grundsätze
-
-- **Jede Aktion antwortet in < 100 ms sichtbar** (Animation startet sofort, Netzwerk läuft parallel — Kap. 18.2). Das ist die direkte Antwort auf die „Hakeligkeit"-Kritik des Kunden.
-- **120 Hz ProMotion** für Reel-Spins und Win-Sequenzen; adaptive Framerate (60/30 Hz idle) für Batterie.
-- **Gestufte Win-Zelebrationen:** Win < 5× Einsatz: knappes Funkeln · 5–15×: „Big Win"-Banner + Münzregen · 15–40×: „Mega Win" Vollbild + Slow-Motion-Zähler · > 40×: „Epic Win" mit Screenshake, Konfetti-Kanonen, Club-Broadcast. Alle Sequenzen per Tap überspringbar (Vielspieler!).
-- **Haptik als Signatur:** Reel-Stops einzeln fühlbar (leichte Taps), Win-Tiers mit eskalierenden Haptic-Patterns (Core Haptics), Bonus-Claim mit „Pop". Haptik ist das, was native Apps von Web-Apps unterscheidbar macht — hier zahlt die Native-Entscheidung direkt ein.
-- **Sound-Design** mit Mute-Respekt (Stummschalter, Hintergrund-Audio anderer Apps nicht unterbrechen).
-- **Dark-First-Design** (Casino-Atmosphäre, OLED), klare Zahlen-Typografie, Kurzformate (1,2 Mio).
-
-### 14.2 Ethische UX-Leitplanken (bewusste Abweichungen vom Genre-Standard)
-
-- **Keine Losses-Disguised-as-Wins:** Ein Spin, der netto verliert, wird nicht als Gewinn zelebriert (Genre-Standard wäre das Gegenteil — wir verzichten bewusst, Kap. 16).
-- **Kein künstliches Near-Miss-Tuning:** Reel-Stopps folgen dem ehrlichen RNG-Ergebnis.
-- Countdown-/FOMO-Elemente ja, aber ohne Dark Patterns (kein „Nur noch 1 verfügbar!" bei digitalen Gütern, keine Fake-Rabatte).
-
----
-
-## 15. Monetarisierung
-
-### 15.1 Modell
-
-- **Coin-Packs via Apple IAP** (5–7 Preispunkte, 1,99–99,99 €; Apple-Kommission 15–30 % einpreisen). Keine Abos zum Launch (Option: „Season-Booster"-Abo später prüfen — Vorsicht: darf sich nicht wie Premium-Währung anfühlen).
-- **Personalisierte Offers** (Segment-basiert, A/B-getestet): First-Purchase-Angebot, Comeback-Offers, Event-Bundles (Coins + Kartenpaket + Free-Bet-Token).
-- **Piggy-Bank-Mechanik („Tresor"):** Prozentsatz der Gewinne füllt einen sichtbaren Tresor, der per Kauf geöffnet wird (Endowment-Effekt; +15–20 % Umsatz-Benchmark). **Empfehlung: ja, aber transparent** — Füllstand und Preis immer sichtbar, keine wachsenden Preisstufen ohne Ankündigung (Slotomania-Community-Backlash als Warnung).
-- **Rewarded Ads: nein** (Premium-Markenumfeld des Betreibers; Ad-basierte Bonus-Verdopplung wirkt billig und kannibalisiert IAP).
-- **Kein Pay-to-Win gegenüber Menschen:** Käufe beschleunigen Coins/Komfort, aber Leaderboards/Tipp-Wertungen basieren auf relativen Metriken (Kap. 12) — wichtig für die Sport-Glaubwürdigkeit.
-
-### 15.2 Erwartungsrahmen
-
-Benchmarks (Anhang B): ARPDAU 0,4–1,0 USD, Payer-Konversion 2–6 %. Konservativer Business-Case sollte mit ARPDAU 0,25–0,40 im Jahr 1 rechnen (neue Marke, kuratierter Content-Umfang), Upside über Sport-Events und Club-getriebene Retention. **Hinweis:** Falls die strategische Priorität des Auftraggebers Engagement/Markenbindung statt Direktumsatz ist (plausibel für einen Wettanbieter), kann die Offer-Aggressivität deutlich unter Genre-Standard bleiben — das Konzept funktioniert in beiden Betriebsmodi; die Entscheidung beeinflusst Ökonomie-Tuning und sollte vor dem Balancing fallen (Kap. 21).
-
-### 15.3 DTC-Perspektive (später)
-
-Playtika verlagert massiv auf eigene Webshops (Q1 2026: +62,8 % YoY DTC). Für v2 prüfenswert (Web-Shop mit Bonus-Coins), abhängig von Apple-Regeln zum externen Kauf im Zielmarkt.
-
----
-
-## 16. Responsible Gaming & Ethik
-
-Ein Echtgeld-Wettanbieter, der ein Simulated-Gambling-Spiel launcht, steht unter verschärfter Beobachtung (Presse, Regulierer, Wissenschaft). RG ist hier nicht Compliance-Kür, sondern **Markenschutz**:
-
-- **18+ strikt** (Apple-Rating „häufiges simuliertes Glücksspiel" = 18+; Australien R18+ gesetzlich).
-- **RG-Suite ab Launch:** selbst gesetzte Kauf-Limits (Tag/Woche/Monat), Zeitlimit-Erinnerungen („Reality Check" nach X Minuten), Spielpausen (24 h bis 6 Wochen), Self-Exclusion (dauerhaft), vollständige Kaufhistorie in der App, Hilfe-Links (check-dein-spiel.de, BZgA, lokale Äquivalente).
-- **Behavioral Monitoring:** Frühwarn-Modelle auf riskante Muster (nächtliche Kaufserien, Loss-Chasing-Signaturen); Reaktion: sanfte Interventionen (Pause-Vorschlag, Offer-Unterdrückung für markierte Accounts — *Offers an Risikospieler auszuspielen ist das Reputations-Worst-Case*).
-- **Ehrliche Mathematik:** Slot-RTP im realistischen Bereich (~90–96 %), **nicht** geschönt — überhöhte F2P-Gewinnquoten erzeugen falsche Erwartungen und sind der wissenschaftlich meistkritisierte Gateway-Mechanismus (Anhang C, Kim et al.: ~25 % Migration zu Echtgeld binnen 6 Monaten).
-- **Keine Echtgeld-CTAs, kein Funnel-Design** (Kap. 10.5) — die App ist ein eigenständiges Unterhaltungsprodukt.
-- **Verzicht auf LDW & Near-Miss-Tuning** (Kap. 14.2) — dokumentierbar, auditierbar, kommunizierbar („Fair-Play-Charta" als Teil des Marketings).
-
----
-
-## 17. Regulatorik & Store-Compliance (Zusammenfassung; Details Anhang C)
-
-| Bereich | Anforderung/Risiko | Konsequenz |
+| Level | Freischaltung (MVP) | ab v1.0 |
 |---|---|---|
-| Apple 5.3.3 | IAP-Währung darf nicht mit Real Money Gaming verknüpft sein | Keine RMG-Brücke, getrennte Accounts/Systeme |
-| Apple 3.1.1 | Digitale Güter nur via IAP | Coin-Verkauf ausschließlich IAP (Launch) |
-| Apple 4.7/4.7.5 | HTML5-Games eingeschränkt; Altersfilter | Slots nativ im Binary |
-| Apple Age Rating (neu 2025) | Häufiges simuliertes Glücksspiel = 18+ | 18+ einplanen (Marketing entsprechend) |
-| USA/Washington | Big-Fish-Präzedenz: Coins als „thing of value" | Washington geo-blocken oder Mechanik-Gutachten; „Weiterspielen nie kaufpflichtig" (Kap. 6.4) |
-| USA/Sweepstakes | Verbotswelle 2025 | Kein Redemption-Element — ohnehin nicht geplant |
-| Belgien | Lootbox-/Glücksspiel-Auslegung | Geo-blocken (Branchenpraxis) |
-| Australien | R18+ Pflicht für simuliertes Glücksspiel | Rating-Prozess einplanen |
-| Deutschland | Social Casino ohne Auszahlung grundsätzlich legal; ABER § 5 GlüStV: Dachmarken-Werberisiko, wenn der Betreiber keine Lizenz für virtuelle Automatenspiele hat | **Separate Marke ernsthaft prüfen**; alternativ DE-Version ohne Slots (nur F2P-Sport); zwingend Kanzlei + ggf. GGL-Abstimmung **vor** Namens-/Markenentscheidung |
-| Österreich/NL/UK | Ohne Cash-out/Handel derzeit kein Glücksspiel | Kein Handel, kein Cash-out (Design-Invariante) |
-| Datenschutz | DSGVO/ATT: First-Party-Daten nur mit Consent; kein Datenabfluss Richtung Echtgeld-Profil ohne separate Rechtsgrundlage | Consent-Architektur früh designen |
+| 1 | Realsport (Einzel), Liga, Tages-Tipp, Bonus, Arena Spins | — |
+| 3 | Daily Challenges | — |
+| 5 | 2er-Kombis | — |
+| 8 | **Freundesliste + Geschenke** (MVP-Sozialschicht) | **Club-Beitritt + Duelle** (ersetzt/erweitert die Freundesliste) |
+| 10 | Live-Wetten Realsport + Cash-out | — |
+| 12 | Kombis bis 4er | — |
+| 20 | Captain's Six | + Club-Gründung (500-T-Gebühr) |
+| 30+ | — | Turnier-Klassen, Kosmetik, Prestige |
 
-**Wichtigste Einzelmaßnahme:** Die Marken-/Jurisdiktionsfrage (separate Marke vs. Dachmarke; Länder-Featureset) muss **vor** Projektstart juristisch geklärt werden, weil sie Naming, Store-Setup, Geo-Architektur und Marketing bestimmt.
+**Freundesliste (MVP, minimal spezifiziert):** Hinzufügen per Einladungscode/Kontakten; 1 Coin-Geschenk/Tag je Freund (levelskaliert, Empfangs-Cap); Datenmodell-Entität `Friend` in Phase 1 (Kap. 20.3) — wird in v1.0 zur Club-Mitgliedschaft migriert.
 
----
+### 7.3 Einsatz-Progression
 
-## 18. Technische Architektur
-
-### 18.1 Client: Nativ iOS — Empfehlung mit einer wichtigen Weiche
-
-**Der Kundenpräferenz (nativ statt Web) stimme ich zu** — mit präzisierter Begründung: Der Vorteil von nativ ist *nicht*, dass Entscheidungen ohne Server auskommen (das dürfen sie bei einer Casino-Ökonomie nie, s. 18.2), sondern: 120-Hz-Rendering, Core Haptics, APNs-Zuverlässigkeit, App-Attest-Sicherheit, StoreKit-2-IAP und ein UI, das sich anfühlt wie das OS.
-
-- **Stack:** SwiftUI (App-Shell, Lobby, Sport-Tab, Club, Shop, Profil) + **SpriteKit/Metal** für den Slot-Renderer (`SpriteView`-Einbettung; `SKEmitterNode`-Partikel für Win-Celebrations; Custom-Metal-Shader für Glow/Münzregen). Swift Concurrency durchgängig; The Composable Architecture o. ä. optional — wichtiger ist ein sauberes „ein Screen = ein Feature-Modul".
-- **Die Weiche:** Will der Kunde binnen ~18 Monaten Android (bei der Zielgruppengröße wahrscheinlich), ist **Unity für den Slot-Core im nativen SwiftUI-Wrapper** der Branchenstandard und spart die Doppel-Implementierung des aufwendigsten Teils. Diese Entscheidung ist vor Sprint 1 zu treffen — nachträglich ist sie ein Rewrite. **Meine Empfehlung: iOS-first nativ wie vom Kunden gewünscht, aber die Slot-Logik (Mathe-Modelle, Konfigurationsformat) plattformneutral spezifizieren**, sodass ein späterer Android-Client (nativ Kotlin oder Unity) dieselben Server-Definitionen rendert.
-
-### 18.2 Das Latenzproblem — richtig gelöst (Antwort auf die Kern-Kritik des Kunden)
-
-Die Diagnose „Apps fühlen sich hakelig an, weil jede Entscheidung vom Server bestätigt werden muss" ist richtig beobachtet — aber die Lösung ist **nicht Client-Autorität**. Eine client-autoritative Coin-Ökonomie wäre binnen Tagen durch Memory-Editing (GameGuardian), Jailbreak-Hooking und Replay-Manipulation zerstört; gefälschte Big Wins würden Leaderboards, Club-Ligen und das Tippspiel entwerten. **Der Server bleibt die einzige Wahrheit (RGS-Muster) — aber der Spieler merkt es nie:**
-
-1. **Sofortige Animation:** Tap → Reels drehen in < 50 ms los (rein clientseitig), der Spin-Request läuft parallel. Die Server-Antwort (50–300 ms) ist längst da, bevor die Reels nach 1,5–2 s auslaufen; der Client steuert sie auf das Server-Ergebnis zu. *Gefühlte Latenz: null.*
-2. **Optimistic UI + Idempotenz:** Einsatz wird sofort lokal abgezogen; jede Transaktion trägt einen Idempotency-Key; bei Timeout wird derselbe Spin sicher erneut angefragt (kein Doppelabzug, kein verlorener Gewinn).
-3. **Pre-Fetch & Batching:** Turbo-/Autoplay holt Ergebnisse gebündelt (z. B. 10 Spins/Request, serverseitig committed). Der nächste Einzelspin wird bereits während der Win-Präsentation vorgeladen.
-4. **Persistenter WebSocket** statt Request/Response-Zyklen: Balance-Updates, Wett-Settlements, Club-Chat, Live-Quoten, Turnier-Leaderboards als Push — nichts davon blockiert je die UI.
-5. **Deterministische Replays:** Server persistiert Seed + Modellversion + Ergebnis je Spin; abgebrochene Bonusrunden werden exakt fortgesetzt, Support-Fälle sind beweisbar.
-6. **Offline:** Kein Offline-Gameplay (Ökonomie-Integrität). Bei Verbindungsverlust: eleganter Zustand („Verbindung wird wiederhergestellt…"), Lobby bleibt browsebar.
-
-### 18.3 Backend
-
-- **Kern:** Nakama (Heroic Labs) als Basis *oder* Eigenbau in Go/Elixir — Entscheidung nach Team-Skills des Kunden. Nakama liefert Wallet, Chat, Leaderboards, Turniere und server-autoritative Module (Go/TS) out of the box und verkürzt die Time-to-Market deutlich; ein Anbieter dieser Größe hat aber vermutlich Plattform-Teams, die Eigenbau bevorzugen.
-- **Slot-Engine:** eigener Service (Go): Mathe-Modelle als versionierte Konfiguration (Symbole, Reels, Paytable, Feature-Trigger), zertifizierbarer RNG (auch wenn Social keine Zertifizierung *verlangt*, schafft ein auditierbarer RNG Vertrauen und hält die Tür zu Prüfsiegeln offen).
-- **Sport-Settlement-Service:** konsumiert den Odds-/Ergebnis-Feed (Betradar/Genius; F2P-Lizenzklausel klären), verwaltet virtuelle Wettscheine, Cash-out-Berechnung, Settlement-Fanout via WebSocket/Push.
-- **Daten:** PostgreSQL (Wallet/Ledger als Append-only-Buchungssätze — *nie* nur ein Balance-Feld), Redis (Sessions, Leaderboards, Rate-Limits), Event-Stream (Kafka o. ä.) → DWH.
-- **LiveOps:** Remote Config (Firebase o. Eigenbau) für Events, Bonus-Parameter, Feature-Flags; Offer-Engine mit Segment-Targeting; alles ohne App-Release schaltbar.
-- **Analytics:** Amplitude (Events, Kohorten, Experiment) + eigenes DWH; Push via APNs (Token-based) über CRM-Orchestrierung (z. B. Braze).
-
-### 18.4 Sicherheit & Anti-Cheat
-
-- Wallet-Mutationen ausschließlich serverseitig; Client sendet nur Intents.
-- **App Attest** + DeviceCheck, Jailbreak-Heuristiken, zertifikatsgepinnte TLS-Verbindungen.
-- IAP: serverseitige Receipt-Validierung (App Store Server API v2, signierte Transaktionen).
-- Anomalie-Erkennung: unmögliche Spin-Frequenzen, statistisch auffällige Gewinnraten, Multi-Account-Muster (Club-Punkte-Farming!), Geräte-Fingerprints für Derby-/Liga-Integrität.
-- Rate-Limits pro Endpoint; Chat: serverseitige Filter + Melde-Pipeline + Moderations-Backoffice (App-Store-Pflicht für UGC: Melden, Blockieren, Moderation — Guideline 1.2).
-
-### 18.5 Geo & Compliance-Technik
-
-Serverseitiges Geo-Gating (Storefront-Ausschluss + IP/Region-Check) für die Blockliste (mind. Belgien, Washington-Entscheidung offen); länderspezifische Feature-Flags (z. B. DE-Variante ohne Slots, falls die Markenentscheidung das erfordert — Kap. 17).
+Min 5.000 · **Max = 25.000 × 1,25^⌊(Level−1)/2⌋, abgerundet auf 5.000er** (beide Artefakte identisch), global 10 Mio. Slider mit Max-Aktion; Cap serverseitig durchgesetzt. **Status-Track:** Saison-Rang (Bronze→Diamant) aus Aktivität — kosmetisch + Geschenk-Limits, kein Bonus-Effekt (6.3).
 
 ---
 
-## 19. Analytics & KPIs
+## 8. Bonus-System v3
 
-**North-Star-Metrik:** *Tägliche „aktive Einsätze" pro DAU* (Spins + settled Bets) — das Äquivalent zu Coin Masters „Spins per DAU": eine Zahl, auf die Bonus-Ökonomie, Events, Clubs und Sportkalender alle einzahlen.
+- **Höhe:** Basis 20.000 × 1,10^(min(L,60)−1) × min(Bonus-Serie × Stadion [× Club-Liga-Division ab v1.0], 2,0). **Bonus-Serie:** ×1,07 (Tag 1) bis ×1,49 (Tag 7+), Formel 1 + 0,07 × min(Tage, 7); bricht bei Kalendertag ohne Claim; Streak-Repair 1×/Woche. Jeder Claim +2 Freispiele.
+- **Atomarität:** Gutschrift im Claim-Moment; Overlay rein zelebratorisch; ausstehendes Rad wird persistiert und nachgeholt.
+- **Special additiv:** 3. Claim = Basis + Freispiele **und** Rad (EV-Budget s. 6.2); Ring verfällt nie.
+- **Akkumulation** bis 6 h (1,5 Fenster) und **Wochenbogen** (7 Claim-Schlüssel → Wochen-Truhe) aus v1 übernommen (Produkt-Spec; in den Demo-Artefakten nicht umgesetzt).
 
-| Kategorie | KPI | Zielwert (Jahr 1) |
+*Terminologie: „Bonus-Serie" (Claims), „Tipp-Serie" (Tages-Tipp) und „Wochenbogen" (Schlüssel) sind drei getrennte Systeme und werden im UI so benannt.*
+
+---
+
+## 9. ARENA Liga
+
+**Rolle (präzisiert):** Die Liga übernimmt die *Verfügbarkeits-Rolle* der v1-Slots (24/7 bespielbarer Kern-Loop, Haupt-Senke, Sofort-Settlement). Sie ersetzt **nicht** die Slot-*Frequenz* (Handlung alle 2–4 s) — das ist Absicht (kein Slot-Kompulsions-Klon), aber damit ist offen, ob ein Einzelspiel im 3-Minuten-Takt 8–12-Minuten-Sessions trägt. **Offene Produktfragen für Soft-Launch-Experimente:** (a) 2–3 parallele Spiele mit versetztem Anstoß, (b) Markttiefe (nächstes Tor, Handicap), (c) Taktung 2–4 Min. Die Session-Ziel-KPIs werden bis dahin nicht auf die Liga allein gerechnet.
+
+- **Format:** 8 fiktive Teams (lizenzfrei), fortlaufende Paarungen; **Zyklus ~3 Min** (Spielverlauf ~2,5 Min Zeitraffer, Pause ~30 s); Tabelle; **Saisons (2 Wochen) ab Phase 2**.
+- **Märkte:** 1X2, Über/Unter 2,5. Preisbildung: Kap. 6.6 (exakt, Hold 7,5 %). Live-Drift folgt Spielstand/Restzeit aus demselben Modell; **Suspendierung bei Toren** (~2,5 s, offene Auswahlen verworfen); **Annahmeschluss 80.'**; Repricing bei Platzierung (Kap. 10).
+- **Cash-out (Liga): Phase 2** — gleiches deterministisches Pricing wie Realsport (Kap. 10); bis dahin sind Liga-Wetten bis zum Settlement gebunden. Liga-Selektionen sind mit Realsport kombinierbar (leg-weises Settlement macht das sauber); Duelle sind immer Einzel.
+- **Integrität & Transparenz:** auditierbarer RNG, Replays, Ergebnis-Historie einsehbar, Auszahlungsquote (92,5 %) offen im UI.
+- **Verzahnung:** XP 1,0× · Club-Chest/-Liga · Challenges · Tages-Tipp · Duelle · Blitz-Turniere (Phase 2, Buy-in + Rake).
+- **RG:** Reality-Checks/Limits greifen ausdrücklich für die Liga (Kap. 18); keine dramatisierten Fast-Gewinne — der Verlauf folgt dem ehrlichen Modell.
+
+---
+
+## 10. Echtes Sportsbook (Realsport)
+
+- **Feed:** Cashpoint (unter G0); Klärung Mandanten-Trennung F2P/RMG (Apple 5.3.3), SLA, Markt-/Sportartenabdeckung je Zielmarkt. Fallback: Sportradar/Genius (F2P-Klausel, Kosten offen — Risiko 1).
+- **Angebot:** kuratierte Top-Märkte; **Sportarten marktabhängig**: DACH Fußball-zentriert; Soft-Launch-Märkte brauchen NHL/NBA/NFL bzw. lokale Ligen (Feed-Abdeckung in Phase 0 prüfen — Kap. 22). Langzeitwetten; Einzel/Kombi nach Gates.
+- **Live + Cash-out (ab L10, MVP):** zustandsgetriebene Quoten; Cash-out deterministisch (fairer Wert × 0,93; Cap 0,95 × möglicher Gewinn; Anzeige = Auszahlung); Annahmeschluss 85.'. *Hinweis FTUE: Live ist hinter L10 — im Onboarding wird es als sichtbarer, gesperrter Teaser gezeigt, damit der Kern-USP nicht unsichtbar bleibt (Kap. 14).*
+- **Settlement leg-weise:** won/lost/void je Leg; Kombi verliert beim ersten Lost-Leg; **Void = Quote 1,0**; alles void = Erstattung; verwaiste Legs (abgesagte Events) werden erstattet. **Repricing:** Live-/Liga-Legs zur aktuellen Quote; > 5 % Drift ⇒ Schein zur Bestätigung zurück.
+- **Keine Echtgeld-Brücke** (CTAs, Links, geteilte Guthaben) — unverändert.
+
+---
+
+## 11. Appointment-Layer
+
+- **Tages-Tipp:** 1 Gratis-Pick/Tag auf das nächste Liga-Spiel. **Zweck: tägliches Ritual mit Sofort-Feedback und Serien-Druck** — ausdrücklich *kein* „zweiter Tagesbesuch"-Mechanismus (Review-Korrektur). Belohnung 25.000 × min(Tipp-Serie, 10); Serie bricht bei Fehltipp oder ausgelassenem Tag; nicht zu Ende geschauter Pick verfällt neutral (Tag verbraucht, Serie bleibt). *Produkt-Option für Spieltage: zusätzlicher kuratierter Real-Pick mit später Auflösung — der ist dann der Rückkehr-Anker.*
+- **Daily Challenges:** „2 Tipps" = settled **Coin-Einsatz-Wetten beliebiger Art** (Realsport oder Liga; der Gratis-Tages-Tipp zählt nicht) · „1 Liga-Wette" (zählt zugleich als Tipp — bewusste Überlappung als Liga-Nudge) · „2 Bonus-Claims" · „5 Freispiele". Einzeln sofort gutgeschrieben; alle 4 = Tages-Chest.
+- **Captain's Six (ab L20):** 6 Paarungen/Woche; progressiver Community-Jackpot (12,5 Mio + 2,5 Mio/Woche), 5/6 = 1 Mio, 4/6 = 250 T; Club-Wertung ab v1.0.
+
+---
+
+## 12. Clubs, Duelle & Social Betting
+
+Club-Grundgerüst aus v1 Kap. 9 (50 Mitglieder, Rollen, Chest → **Club-Liga** → Derby, Geschenk-Ökonomie mit Empfangs-Cap, Mitglieder-Statistiken). **Club-Liga definiert:** wöchentliche 20er-Gruppen, Divisionen Bronze→Master mit Auf-/Abstieg; „+2 %/Division" (6.3) referenziert die erreichte Division. Alle Einsätze zählen — ausdrücklich auch ARENA-Liga-Einsätze.
+
+### Tipp-Duell (v1.0)
+
+- Nur Club-intern (ab L8-Gate greift im MVP die Freundesliste, Duelle kommen mit Clubs in v1.0).
+- **Bindung:** an das nächste Liga-Spiel **zum Zeitpunkt der Erstellung**; der Herausgeforderte kann bis zum Anstoß annehmen (Push), sonst verfällt die Herausforderung (Erstattung). *Demo-Artefakte simulieren Sofort-Annahme.*
+- **Einsatz:** gleich hoch für beide; Cap = **min(Level-Cap beider Spieler)** — der Herausforderer sieht das Limit vorab.
+- **Pot & Rake:** Gewinner erhält 95 % des Pots; keiner richtig ⇒ Erstattung. Kein freier P2P-Transfer (Escrow + Settlement-Bindung; Einordnung Kap. 19).
+- **Ausbau:** Revanche, Duell-Bilanz in der Mitglieder-Tabelle, Duelle auf Realspiele (späte Auflösung), Tages-Duell-Caps.
+- **Collusion-Schutz:** Rake als Transfersteuer, Caps, Duell-Graph-Anomalieerkennung, Geräte-Fingerprints — plus definierter **Review-Prozess mit Personal** (Kap. 15).
+
+### Tipp teilen & Copy-Bet (Phase 3, aus v1 übernommen)
+
+Wettschein in den Club-Chat posten; Mitglieder gehen per Tap mit eigenem Einsatz mit (Rebet-Muster).
+
+---
+
+## 13. Stadion, Minigame & Sammel-Meta
+
+- **Stadion:** 4 Ausbauten × 5 Stufen; **Stufe n = 250.000 × 2^(n−1)**; Vollausbau 31 Mio; Ertrag: XP (Kosten/20), Status, **+1,5 % Arena Bonus je Stufe (max +30 %)**. Ausbau-Ideen: visuelles Stadion, Club-Stadion (Phase 3).
+- **Arena Spins:** 3×3, 5 Linien, Paytable 5×–60×; Gewinnbasis 0,5 × Bonus-Basis; nur Freispiele; Fest-XP; Ergebnis vor Animation fix (Server-RNG); Länder-Feature-Flag. Freispiel-Quellen: Bonus (+2/Claim), Rad, Challenges, Level-Ups (+3), Rettungsleine.
+- **Free-Bet-Token: in v3 gestrichen** (v1-Mechanik ohne v3-Vergabeweg). Das Kaufverbot in Kap. 17/19 gilt generisch für „Gewinnchancen-Ressourcen jeder Art" — falls Free-Bets je eingeführt werden, sind sie damit abgedeckt.
+- **Sammelalbum:** Phase 3 (Drops aus Settlements, Rad, Chests).
+
+---
+
+## 14. FTUE & Onboarding (neu — Grundlage des D1-Gates)
+
+1. **Start ohne Registrierungszwang** (Guest/Sign in with Apple); Progress-Migration bei späterem Login.
+2. **18+-Gate:** Store-Rating 18+ + Selbstauskunft im FTUE; ob echte Altersverifikation nötig ist (simuliertes Glücksspiel unter Wettmarke), entscheidet das Gutachten (Phase 0).
+3. **Skript Minute 1–5:** Willkommenspaket (1 Mio) → geführter Liga-Tipp auf das nächste Spiel (Anstoß < 30 s) → **erstes Sofort-Settlement in Minute 1–3** (ehrliches D0-Ziel: das *Erlebnis* Settlement, kein garantierter Gewinn — Gewinn-Tuning wäre ein Verstoß gegen Kap. 16) → Bonus-Claim erklärt (+Freispiele → 1 geführter Arena-Spin) → Tages-Tipp setzen → Level 3–4 via FTUE-Fest-XP.
+4. **Permission-Momente:** Push-Pre-Permission nach dem ersten Settlement („Wir sagen dir, wenn dein Tipp durch ist"); ATT nur falls nötig, spät. **Push-Opt-in-Rate ist KPI** (Kap. 21) — das Retention-Modell hängt an Push.
+5. **Consent-Flow** (Analytics-Klassen, Kap. 21) beim Start, granular.
+6. Gesperrte Kern-Features (Live/Cash-out ab L10, C6 ab L20) sind sichtbar geteasert.
+
+---
+
+## 15. Betrieb & Organisation (neu)
+
+- **LiveOps-Kadenz (v3):** täglich Challenges/Bonus/Featured-Liga-Events · wöchentlich Club-Liga/Chest/C6/Wochen-Truhe · 2-wöchentlich Liga-Saison (Ph. 2) + A/B-Event · monatlich Kosmetik/Feature-Drop · 6–8 Wochen große Season (Ph. 3) · ad hoc Sport-Großereignisse. Alles Remote-Config, kein Release-Zwang.
+- **Personal & Prozesse (in Phase 0 zu beziffern — Opex ist beim Engagement-Produkt die zentrale Business-Case-Größe):** LiveOps/Economy-Analyst (A/B mit Holdout ist Pflichtprozess), Support (24/7-Liga ⇒ Settlement-Disputes; Replays als Beweismittel), **Moderationsteam ab v1.0** (Chat, Apple 1.2, Leader-Tools), Collusion-/Fraud-Review, CRM-Betrieb, On-Call für Liga-Engine/Feed.
+- Community-/Krisenprozesse (RG-Eskalation, Presseanfragen zum Thema simuliertes Glücksspiel).
+
+---
+
+## 16. UX, Game Feel & Barrierefreiheit
+
+- **Orientierung:** Landscape als Arbeitsentscheidung (E4). **Governance:** Vor Entwicklungsstart Usability-Test (n ≥ 12, Portrait- vs. Landscape-Artefakt; vorab definierte Kriterien: Task-Erfolg/-Zeit Wettschein & Liga, Einhand-Nutzung, Second-Screen-Szenario, Präferenz). Bei klarem Portrait-Vorteil entscheidet der Auftraggeber **neu auf Datenbasis** — die Architektur hält die Orientierung als reine Layout-Schicht (zwei Chrome-Varianten; Doppelpflege-Kosten sind im Budget auszuweisen, nicht wegzudefinieren).
+- **Reaktionsgefühl:** < 100 ms sichtbare Antwort; gezielte DOM-/View-Patches statt Re-Renders (kein Tap-Verlust); Latenz hinter Animationen (v1-Muster auf Wett-Momente).
+- **Haptik & Zelebration:** Claim-Pop, Tor-Impact, Settlement, Duell-Sieg; gestufte Win-Feiern, überspringbar. **Ethik unverändert:** keine LDW, kein Near-Miss-Tuning, keine Fake-Knappheit.
+- **Barrierefreiheit (neu, EAA/BFSG seit 28.06.2025 anwendbar — IAP-Shop macht die App plausibel prüfpflichtig):** BFSG-Anwendbarkeitsprüfung in den Gutachtensauftrag (Phase 0); MVP-Akzeptanzkriterien: VoiceOver-Pfade für Kernflüsse, Dynamic Type, Mindestkontraste (Gold-auf-Dunkel prüfen!), Reduced-Motion-Modus, **nicht-zeitkritische Alternativen** (verlängerte Annahmefenster/Assist-Modus für Suspendierung & Annahmeschluss), Haptik nie alleiniger Informationsträger.
+- **Lokalisierung:** MVP **DE + EN**; Soft-Launch-Markt bestimmt weitere Sprachen (Kap. 22); saubere Pluralisierung, Kurzform-Zahlen.
+
+---
+
+## 17. Monetarisierung & Engagement-Messung
+
+- IAP-Coin-Packs (5 Punkte, 1,99–49,99 €), dezenter Shop, keine aggressiven Offers/Piggy-Bank/Ads/Abos. **Nie kaufbar:** Gewinnchancen-Ressourcen jeder Art (Freispiele, Free-Bets, Boosts, Duell-Vorteile).
+- Erwartung: ARPDAU 0,05–0,15 USD, Konversion 1–2 %.
+- **Engagement-Wert messbar machen (Auflage zu E3 — sonst ist der Betriebsmodus nicht steuerbar):**
+  1. **Opt-in-Verknüpfung** („Merkur-Konto verknüpfen" für Kosmetik-Bonus, nur mit granularer Einwilligung; erfüllt die Zweckbindung aus Kap. 19) → messbare Kennzahl „verknüpfte Aktive".
+  2. **Brand-Lift-/Inkrementalitätsmessung** im DE-Beta-Betrieb (Panel/Umfrage; keine CRM-Datenflüsse nötig).
+  3. **Zielwerte & Kill-Kriterien** vor Soft Launch festlegen (z. B. Kosten je aktiv gebundenem Nutzer vs. UA-Benchmark der Wettmarke; Opex-Deckel aus Kap. 15).
+
+---
+
+## 18. Responsible Gaming
+
+v1-Suite komplett (Limits, Reality-Checks, Pausen, Selbstausschluss, Kaufhistorie, Hilfe-Links, Behavioral Monitoring mit Offer-Unterdrückung, ehrliche Mathematik, Fair-Play-Charta) + v3: Limits/Checks gelten ausdrücklich für Liga & Duelle; Liga kommuniziert 92,5 % Auszahlungsquote offen; neutrale Trefferquoten-Darstellung (keine Skill-Illusion); Duell-Herausforderungen ablehnbar ohne Pranger, Duell-Push-Cap.
+
+---
+
+## 19. Regulatorik & Store-Compliance
+
+| Bereich | v3-Status |
+|---|---|
+| **Gate G0** | Merkur-Annahme formal bestätigen — Vorbedingung für Gutachtensauftrag, Feed-Workshop, Naming. **Plan B** (Nicht-Merkur): externer Feed (Sportradar/Genius, F2P-Klausel) + separate Marke; reaktiviert v1-Risiken #1/#5 |
+| DE / § 5 GlüStV | Unter Merkur-Annahme voraussichtlich entschärft (GGL-Lizenzen auch für virtuelle Automatenspiele) — **Gutachten v3**: Arena Spins (freispiel-only) werberechtlich, **ARENA Liga** (virtuelles Wett-Derivat ohne Geldwert), Tipp-Duell (Escrow-Mechanik vs. P2P), Dachmarke/Naming, Altersverifikationspflicht (Kap. 14), **BFSG** (Kap. 16) |
+| Apple | 5.3.3 / 3.1.1 / Rating 18+ als Konstante / R18+ AUS / UGC 1.2 / Pre-Submission mit v3-Featureset |
+| USA „thing of value" | trifft Coin-Wetten im Kern → Geo-Liste = Marktentscheidung; Rettungsleine + 24/7-Liga als Verteidigung |
+| Soft-Launch-Märkte | **Regulatorik der Kandidaten prüfen (Phase 0):** Ontario/AGCO-Umfeld, Norwegen (Monopol/Werberecht), Schweden — bisher ungeprüft (Review-Lücke) |
+| Datenschutz | F2P-Wettdaten = RMG-CRM-relevant ⇒ strikte Zweckbindung; Verknüpfung nur per Opt-in (Kap. 17); Data-Flow-Diagramm als Gutachten-Anlage |
+| Geo/Flags | Belgien blocken; Länder-Featureset-Flags ab MVP (Arena Spins!) |
+
+---
+
+## 20. Technische Architektur
+
+### 20.1 Client
+SwiftUI-first + SpriteKit-Modul (Minigame/Rad); Core Haptics; kein Unity; Android Kotlin (+ optional KMP für Domain-Logik); Orientierung als Layout-Schicht (zwei Chromes). Referenzstruktur: `arena-ios/` (GameState-Schicht = spätere Server-Schnittstellen).
+
+### 20.2 Backend-Services
+Wie v3-Erstfassung (12 Services): Cashpoint-Ingestion (Mandanten-Trennung) · Katalog/Kuratierung · Odds-Cache + WS-Fanout · Bet-Service (Repricing, Idempotenz, Level-Cap) · Settlement-Engine (leg-weise, Void-Regeln, Massen-Settlement gebatcht) · Cash-out-Pricing · **Virtual-League-Engine** (Preis = Simulationsmodell, Kalibrier-CI aus 6.6, auditierbarer RNG, Replays) · Duell-Service (Escrow, Annahme-Timeout, Collusion-Detektion) · Bonus/Engagement (atomar, Pending-Rad, Serien, Challenges mit Zeitzonen-Reset) · Wallet/Ledger (append-only; Coins + Freispiele getrennt) · Club/Chat (Nakama-Sidecar-Option) + Moderation · IAP/RG/Analytics/CRM.
+
+### 20.3 Datenmodell-Kern
+v3-Erstfassung + **Friend** (Phase 1) · Duel(+Escrow) · VMatch(Seed/Modellversion) · VTable/VSeason (Ph. 2) · C6Ticket · StadiumState · Streaks (BonusSerie/TippSerie/Wochenbogen getrennt).
+
+### 20.4 Sicherheit
+v1-Paket + Stale-Odds-/Late-Betting-Schutz (Repricing, Annahmeschluss), Duell-Collusion, Liga-Volumen-Caps, Multi-Account-Farming.
+
+---
+
+## 21. Analytics & KPIs
+
+**North-Star (präzise):** Ø je DAU: Anzahl **settled Coin-Einsatz-Wetten** (Realsport + Liga) **+ angenommene Duelle**. Ausgeschlossen: Gratis-Tages-Tipp, Freispiel-Spins, Claims (Faucet-Aktionen — eigene Gesundheitsmetriken).
+
+| Kategorie | KPI | Ziel (Jahr 1) |
 |---|---|---|
-| Retention | D1 / D7 / D30 | ≥ 32 % / ≥ 15 % / ≥ 8–10 % |
-| Engagement | Sessions/Tag · Session-Länge | 3–5 · Ø 8–12 Min |
-| Bonus | Claim-Rate 3h-Bonus (Claims/mögliche Fenster) | ≥ 45 % bei WAU |
-| Social | % DAU in Clubs · Club-D30 vs. Nicht-Club-D30 | ≥ 40 % · Faktor ≥ 2 erwartbar |
-| Sport | % DAU mit ≥ 1 Wette · Tippspiel-Teilnahme/Woche | ≥ 35 % · ≥ 50 % der WAU |
-| Monetarisierung | Payer-Konversion · ARPDAU | 2–4 % · 0,25–0,40 USD (konservativ) |
-| Ökonomie-Gesundheit | Faucet/Sink-Ratio je Segment · Median-Balance in „Stunden Spielzeit" | Dashboard ab Tag 1, Alerts bei Drift |
-| RG | Limit-Nutzung, Interventions-Rate, Beschwerde-Quote | Monitoring + Reporting |
+| Retention | D1/D7/D30 je Install-Kohorte (Spieltag/Nicht-Spieltag) | ≥ 30/28 · 14/12 · 8/7 % — *D7-Gate im Soft Launch bewusst ohne Clubs kalibriert; Interpretationsregel: liegt D7 bei 10–12 %, gilt das Gate als „bestanden mit Auflage v1.0-Clubs", darunter Kern nachtunen* |
+| Engagement | Sessions/Tag · Ø Länge · % DAU mit ≥ 1 Liga-Tipp | 3–5 · 8–12 Min · ≥ 50 % |
+| FTUE | Abschlussrate FTUE · **Push-Opt-in** · D0-Settlement-Quote | ≥ 75 % · ≥ 55 % · ≥ 80 % |
+| Sport | % DAU mit Realsport-Wette (Spieltage) · C6/WAU | ≥ 45 % · ≥ 40 % |
+| Bonus | Claim-Rate · Bonus-Serien-Halterate D7 | ≥ 45 % · Monitoring |
+| Social (v1.0) | % DAU in Clubs · Duelle/Club-DAU/Woche | ≥ 40 % · ≥ 1,5 |
+| Ökonomie | Faucet/Sink je Segment · **Liga-Hold effektiv (Soll 7,5 %)** · Balance-Median in „Tagen Spielkapazität" | Dashboard + Alerts ab Tag 1 |
+| Engagement-Wert | verknüpfte Aktive (Opt-in) · Brand-Lift (DE-Beta) | Zielwerte in Phase 0 (Kap. 17) |
+| Monetarisierung | Konversion · ARPDAU | 1–2 % · 0,05–0,15 USD |
 
-Experimentier-Kultur ab Launch: Jede Ökonomie-Änderung (Bonushöhen, RTP, Offer-Preise) nur via A/B-Test mit Holdout-Gruppe (Playtika-Playbook — und Playtika-2025-Warnung).
-
----
-
-## 20. Roadmap & MVP-Schnitt
-
-### Phase 0 — Fundament (parallel zur Konzeptfreigabe, 4–6 Wochen)
-Rechtsgutachten (Dachmarke/DE, Geo-Liste, Datenfluss-Consent) · Markenentscheidung · Sportdaten-Lizenzklärung (F2P-Klausel) · Plattform-Weiche (pure native vs. Unity-Slot-Core) · Team-Setup.
-
-### Phase 1 — MVP / Soft Launch (ca. 6–8 Monate Entwicklung; Soft-Launch-Markt: z. B. Kanada/Skandinavien)
-- 4 Slots (davon 1 Sport-Signature), Level 1–50 ausbalanciert
-- 3h-Bonus + Special-Bonus-Rad + Tages-Streak + Wochen-Truhe (das volle Kap.-8-System — es ist der Retention-Kern und muss ab Tag 1 sitzen)
-- Sport: Einzel-/2er-Kombi Pre-Match auf Top-Fußball-Ligen, Daily Pick-Challenges
-- Daily Challenges, Basis-Profil & -Statistiken, IAP-Shop (Basis), RG-Suite, Analytics/Remote-Config komplett
-- **Noch ohne:** Clubs (nur Freundesliste + Geschenke), Live-Wetten, Album, Turniere, Seasons
-- Soft-Launch-Ziel: D1 ≥ 30 %, D7 ≥ 12 %, Bonus-Claim-Rate ≥ 40 % — sonst Kern nachtunen statt Features stapeln
-
-### Phase 2 — v1.0 Global Launch (+3–4 Monate)
-Clubs komplett (Chat, Chest, Liga) · Live-Wetten + Cash-out · Captain's Six · Sammelalbum · Blitz-Turniere · 8+ Slots · personalisierte Offers.
-
-### Phase 3 — LiveOps-Reife (+laufend)
-Derby (Club vs. Club) · Seasons + Season-Leiste · Status-Ränge · Kosmetik-Shop · Tipp-Duelle & Copy-Bets · Mega-Season zum nächsten Großturnier · DTC-Prüfung · Android-Entscheidung.
+Event-Taxonomie als PRD-Pflichtteil (Events + Properties + Consent-Klasse je Story).
 
 ---
 
-## 21. Risiken & offene Entscheidungen
+## 22. Roadmap & MVP
 
-| # | Risiko / Entscheidung | Schwere | Mitigation / Owner |
+### Gate G0 (sofort, vor allen Ausgaben)
+Auftraggeber-/Merkur-Annahme formal bestätigen. Bei Nicht-Bestätigung: Plan B aktivieren (Kap. 19) und Kap. 10/18/19 revidieren.
+
+### Phase 0 — Fundament (4–6 Wochen)
+Rechtsgutachten v3 (inkl. Liga-/Duell-Einordnung, Altersverifikation, BFSG, Soft-Launch-Märkte) · Cashpoint-Workshop (Mandanten-Trennung, SLA, Marktabdeckung je Zielmarkt) · **Ökonomie-Simulation als hartes Gate** (Monte-Carlo; liefert Launch-Faucets/Sinks; Demo-Werte sind ausdrücklich nicht launchfähig — Kap. 6.2) · Orientierungs-Usability-Test mit Entscheidungsregel (Kap. 16) · Naming · Team-/**Opex-Plan** (Kap. 15) · Soft-Launch-Marktwahl (Lokalisierung/Content-Fit/Regulatorik — Kandidaten-Matrix statt Vorfestlegung auf Kanada/Skandinavien).
+
+### Phase 1 — MVP / Soft Launch (Ziel 6–7 Monate, 9–12 FTE — mit Descope-Leiter)
+**P0 (unverzichtbar):** Liga komplett (inkl. Kalibrier-CI) · Sportsbook Pre-Match · Bonus-System · Wallet/Ledger · Einsatz-Slider/Level · FTUE (Kap. 14) · RG-Suite · Analytics/Remote-Config · Geo-Flags.
+**P1 (Soll):** Live + Cash-out Realsport · Tages-Tipp · Challenges · Arena Spins · Stadion · Freundesliste/Geschenke · IAP-Shop.
+**P2 (erste Streichkandidaten bei Terminrisiko):** C6 → v1.0 · Kosmetik · zweite Sprache über DE/EN hinaus.
+*Descope-Regel: Gestrichen wird von unten (P2→P1); P0 ist der Produktkern. Live/Cash-out ist Kern-USP, aber der einzige große P1-Posten mit eigenem Backend-Pfad — fällt er aus dem MVP, verschiebt sich das L10-Gate auf v1.0 und der Soft Launch testet den Evergreen-Kern.*
+**Soft-Launch-Gates:** D1 ≥ 28 % · D7 ≥ 12 % (Interpretationsregel Kap. 21) · Liga-Teilnahme ≥ 45 % · Claim-Rate ≥ 40 % · Faucet/Sink im Simulationszielband. Launch-Timing an Sportkalender koppeln.
+
+### Phase 2 — v1.0 (+3–4 Monate)
+Clubs komplett + **Tipp-Duelle** · C6 · Liga-Saisons + Liga-Cash-out · Liga-Blitz-Turniere · Duelle auf Realspiele · Statistik-/Leaderboard-Ausbau (wöchentliche Resets, Stat-Cards, Hall of Fame — aus v1 Kap. 12) · Moderationsteam-Betrieb · zurückhaltende Offers.
+
+### Phase 3 — LiveOps-Reife
+Derby · große Seasons + Album · Copy-Bet/Tipp-teilen · Kosmetik-Shop · Club-Stadion · Mega-Season · **Android (Kotlin) — Timing-Abwägung: für das Engagement-Ziel in DE ist die Android-Lücke (~60 % Marktanteil) strategisch relevant; Vorziehen nach Soft-Launch-Evidenz prüfen** · DTC-Prüfung.
+
+---
+
+## 23. Risiken & offene Entscheidungen
+
+| # | Risiko / Entscheidung | Schwere | Mitigation |
 |---|---|---|---|
-| 1 | **§ 5 GlüStV / Dachmarke DE** — App unter Sportwetten-Marke könnte als unzulässige Casino-Werbung gelten | Hoch | Rechtsgutachten vor Naming; Option separate Marke oder DE-Featureset ohne Slots. *Entscheidung des Kunden nötig.* |
-| 2 | **Ökonomie-Balance im Ein-Währungs-Modell** — zu großzügig = kein Umsatz & Inflation; zu knapp = Churn & Big-Fish-Risiko; hartes Nach-Rebalancing = Playtika-2025-Szenario | Hoch | Ökonomie-Simulation vor Launch, Soft Launch, alle Änderungen via A/B mit Holdout, Faucet/Sink-Dashboard ab Tag 1 |
-| 3 | **Gateway-/Reputationskritik** (Echtgeld-Anbieter betreibt Simulated Gambling) | Hoch | Kap.-16-Paket vollständig umsetzen und offensiv kommunizieren (Fair-Play-Charta); keine Echtgeld-Funnels |
-| 4 | **Plattform-Weiche** (pure native vs. Unity-Core) falsch gestellt → Android wird Rewrite | Mittel-Hoch | Entscheidung in Phase 0 mit ehrlicher Android-Roadmap; Slot-Definitionen plattformneutral |
-| 5 | **Sportdaten-Lizenz** deckt F2P nicht ab | Mittel | Früh mit Betradar/Genius klären; Fallback White-Label (Low6 u. a.) |
-| 6 | **Apple-Review-Risiken** (18+-Rating, 5.3-Auslegung, UGC-Moderation) | Mittel | Pre-Submission-Review, Moderations-Backoffice ab MVP, keine Grauzonen-Features |
-| 7 | **Club-Toxicity/Moderationsaufwand** | Mittel | Filter + Melde-Pipeline + Moderationsteam ab v1.0; Club-Kick-Tools an Leader delegieren |
-| 8 | **Multi-Account-/Farming-Exploits** (Club-Punkte, Duell-Absprachen) | Mittel | Anomalie-Erkennung, Geräte-Fingerprinting, XP-/Punkte-Caps (Kap. 7.1) |
-| 9 | **Betriebsmodus unklar:** Umsatzprodukt vs. Engagement-/Markenprodukt — beeinflusst Offer-Aggressivität und Ökonomie-Tuning | Mittel | Explizite Zielsetzung mit dem Kunden vor Balancing-Phase festlegen |
-| 10 | **Content-Kadenz** (monatlich neue Slots ist teuer) | Mittel | Slot-Framework mit datengetriebenen Maschinen-Definitionen (neue Maschine = Config + Assets, kein Code) |
+| 1 | **Merkur-Annahme unbestätigt** — trägt Feed, Regulatorik-Story, Architektur, Naming | **Hoch (Tragweite)** | Gate G0 vor allen Ausgaben; Plan B dokumentiert (Kap. 19) |
+| 2 | **Ökonomie-Balancierung** — Demo-Faucets verletzen Zielband um Faktor 4–8 | Hoch | Simulation als Phase-0-Gate; Faucet/Sink-Dashboard + Alerts; nur A/B mit Holdout; Kalibrier-CI |
+| 3 | **Rechtsgutachten v3 offen** (Dachmarke, Liga, Duell, Altersverifikation, BFSG, Soft-Launch-Märkte) | Hoch | Phase 0 sofort nach G0; Arena Spins hinter Länder-Flag |
+| 4 | **Liga-Taktung als Session-Träger unvalidiert** (Frequenz-Rolle bewusst nicht ersetzt) | Mittel-Hoch | Soft-Launch-Experimente (Parallelität/Markttiefe/Taktung); Session-KPIs nicht allein auf Liga rechnen |
+| 5 | **Duell-Collusion** | Mittel-Hoch | Rake, Caps, Graph-Anomalieerkennung, Review-Prozess (Kap. 15) |
+| 6 | **Orientierung** (Arbeitsentscheidung vs. Portrait-Konvention) | Mittel | Test + Entscheidungsregel (Kap. 16); Layout-Schicht; Doppelpflege budgetieren |
+| 7 | **Engagement-Wert unmessbar** → Produkt nicht steuerbar | Mittel | Kap.-17-Auflagen (Opt-in-Verknüpfung, Brand-Lift, Kill-Kriterien) vor Soft Launch |
+| 8 | **MVP-Terminrisiko** (Scope) | Mittel | Descope-Leiter (Kap. 22); Budget-/Opex-Plan Phase 0 |
+| 9 | **Moderations-/Betriebsaufwand** (24/7-Liga, Chat, Duelle) — v1-Risiko reaktiviert | Mittel | Kap. 15; Moderationsteam ab v1.0; Opex im Business Case |
+| 10 | Liga-Wahrnehmung („RNG in Sport-Optik") · Gateway-Kritik | Mittel | Transparenz-Features; Engagement-Modus offensiv; Fair-Play-Charta |
+| 11 | Soft-Launch-Markt-Fit (Lokalisierung/Content/Regulatorik) | Mittel | Kandidaten-Matrix Phase 0 statt Vorfestlegung |
+| 12 | Apple-Review (18+, 5.3, UGC) | Mittel | Pre-Submission; keine Grauzonen |
+
+**Entschieden:** E1–E3, E5–E9 · E4 als Arbeitsentscheidung mit Test-Gate. **Offen:** G0 · Gutachten-Folgen (Marke, DE-Featureset, Altersverifikation) · Orientierung final · Soft-Launch-Markt · Liga-Parallelität/Taktung · Launch-Balancing (Simulation).
 
 ---
 
-*Anhänge: A — Slotomania-Deepdive · B — Wettbewerbslandschaft · C — Technik & Regulatorik (separate Dateien in diesem Ordner, mit Quellen-URLs).*
+*Anhänge A–C: Research-Stand Juli 2026 (v1-spezifische Schlussfolgerungen ersetzt durch dieses Dokument). Review-Protokoll: 4 Perspektiven (Zahlen/Formeln · Vollständigkeit vs. v1 · interne Konsistenz · Advocatus Diaboli), adversarial verifiziert am 12.07.2026; alle bestätigten Findings sind eingearbeitet oder als Risiko/offene Entscheidung geführt.*

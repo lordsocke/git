@@ -1,0 +1,148 @@
+{
+  "games": [
+    {
+      "id": 3179273262,
+      "teams": [
+        {
+          "order": 0,
+          "name": "Frankreich"
+        },
+        {
+          "order": 1,
+          "name": "WM 2026 Sieg"
+        }
+      ],
+      "leagueInfo": {
+        "id": 108895,
+        "order": 21400,
+        "name": "WM 2026 Sieg",
+        "middleName": "WM 2026 Sieg",
+        "shortName": "WM 2026 Sieg",
+        "longTerm": true
+      },
+      "markets": [
+        {
+          "id": 172,
+          "text": "Siegwette",
+          "tips": [
+            {
+              "id": 17201,
+              "oddsId": 3179273262,
+              "text": "Sieg",
+              "textId": 6597069766722,
+              "odds": 250
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3179273272,
+      "teams": [
+        {
+          "order": 0,
+          "name": "England"
+        },
+        {
+          "order": 1,
+          "name": "WM 2026 Sieg"
+        }
+      ],
+      "leagueInfo": {
+        "id": 108895,
+        "order": 21400,
+        "name": "WM 2026 Sieg",
+        "middleName": "WM 2026 Sieg",
+        "shortName": "WM 2026 Sieg",
+        "longTerm": true
+      },
+      "markets": [
+        {
+          "id": 172,
+          "text": "Siegwette",
+          "tips": [
+            {
+              "id": 17201,
+              "oddsId": 3179273272,
+              "text": "Sieg",
+              "textId": 6597069766722,
+              "odds": 420
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3179273292,
+      "teams": [
+        {
+          "order": 0,
+          "name": "Spanien"
+        },
+        {
+          "order": 1,
+          "name": "WM 2026 Sieg"
+        }
+      ],
+      "leagueInfo": {
+        "id": 108895,
+        "order": 21400,
+        "name": "WM 2026 Sieg",
+        "middleName": "WM 2026 Sieg",
+        "shortName": "WM 2026 Sieg",
+        "longTerm": true
+      },
+      "markets": [
+        {
+          "id": 172,
+          "text": "Siegwette",
+          "tips": [
+            {
+              "id": 17201,
+              "oddsId": 3179273292,
+              "text": "Sieg",
+              "textId": 6597069766722,
+              "odds": 440
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3179273282,
+      "teams": [
+        {
+          "order": 0,
+          "name": "Argentinien"
+        },
+        {
+          "order": 1,
+          "name": "WM 2026 Sieg"
+        }
+      ],
+      "leagueInfo": {
+        "id": 108895,
+        "order": 21400,
+        "name": "WM 2026 Sieg",
+        "middleName": "WM 2026 Sieg",
+        "shortName": "WM 2026 Sieg",
+        "longTerm": true
+      },
+      "markets": [
+        {
+          "id": 172,
+          "text": "Siegwette",
+          "tips": [
+            {
+              "id": 17201,
+              "oddsId": 3179273282,
+              "text": "Sieg",
+              "textId": 6597069766722,
+              "odds": 550
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

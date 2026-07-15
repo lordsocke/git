@@ -1,0 +1,21 @@
+{
+  "name": "arena-odds-fetcher",
+  "version": "1.0.0",
+  "description": "ARENA POC odds fetcher — reads public pre-match odds from merkurbets.de (Cashpoint backend), normalizes to the ARENA integration schema, and serves them over HTTP.",
+  "type": "module",
+  "main": "functions/*.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "fetch:once": "node src/cli.js",
+    "fetch:validate": "node src/cli.js --validate --quiet",
+    "discover": "node tools/discover.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0"
+  },
+  "private": true
+}

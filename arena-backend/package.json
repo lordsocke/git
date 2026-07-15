@@ -1,0 +1,15 @@
+{
+  "name": "arena-demo-backend",
+  "version": "0.1.0",
+  "description": "ARENA Demo-Backend v0 — server-autoritative ARENA Liga (RGS-Muster): Engine, Quoten, Wallet, Wetten, Settlement. In-Memory, nur für den POC.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.19.0"
+  }
+}

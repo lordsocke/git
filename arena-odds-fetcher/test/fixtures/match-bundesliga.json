@@ -1,0 +1,184 @@
+{
+  "id": 3195676002,
+  "teams": [
+    {
+      "order": 0,
+      "name": "Bayern München"
+    },
+    {
+      "order": 1,
+      "name": "VfB Stuttgart"
+    }
+  ],
+  "startTime": "2026-08-28T18:30:00Z",
+  "leagueInfo": {
+    "id": 6843,
+    "order": 800,
+    "name": "Deutschland Bundesliga",
+    "middleName": "Bundesliga",
+    "shortName": "Bundesliga",
+    "longTerm": false
+  },
+  "markets": [
+    {
+      "id": 22242,
+      "text": "Wer gewinnt das Spiel?",
+      "categoryIds": [
+        1
+      ],
+      "subcategoryIds": [
+        1
+      ],
+      "placeholders": [],
+      "isPrimary": true,
+      "tips": [
+        {
+          "text": "1",
+          "odds": 127
+        },
+        {
+          "text": "X",
+          "odds": 670
+        },
+        {
+          "text": "2",
+          "odds": 698
+        }
+      ]
+    },
+    {
+      "id": 22252,
+      "text": "Over + / Under - 2,5",
+      "categoryIds": [
+        1,
+        2
+      ],
+      "subcategoryIds": [
+        9
+      ],
+      "placeholders": [],
+      "isPrimary": false,
+      "tips": [
+        {
+          "text": "3+",
+          "odds": 122
+        },
+        {
+          "text": "0-2",
+          "odds": 383
+        }
+      ]
+    },
+    {
+      "id": 22362,
+      "text": "1.HZ Over + / Under - 2,5",
+      "categoryIds": [
+        1,
+        2,
+        5
+      ],
+      "subcategoryIds": [
+        26
+      ],
+      "placeholders": [],
+      "isPrimary": false,
+      "tips": [
+        {
+          "text": "3+",
+          "odds": 300
+        },
+        {
+          "text": "0-2",
+          "odds": 133
+        }
+      ]
+    },
+    {
+      "id": 51572,
+      "text": "Team 1 Over Under 2,5",
+      "categoryIds": [
+        2
+      ],
+      "subcategoryIds": [
+        34
+      ],
+      "placeholders": [],
+      "isPrimary": false,
+      "tips": [
+        {
+          "text": "3+",
+          "odds": 160
+        },
+        {
+          "text": "0-2",
+          "odds": 211
+        }
+      ]
+    },
+    {
+      "id": 51502,
+      "text": "DW: Doppelchance und Over/Under 2,5 Tore im Spiel",
+      "categoryIds": [
+        1
+      ],
+      "subcategoryIds": [],
+      "placeholders": [],
+      "isPrimary": false,
+      "tips": [
+        {
+          "text": "1X-Over",
+          "odds": 135
+        },
+        {
+          "text": "1X-Under",
+          "odds": 455
+        },
+        {
+          "text": "12-Over",
+          "odds": 132
+        },
+        {
+          "text": "12-Under",
+          "odds": 580
+        },
+        {
+          "text": "X2-Over",
+          "odds": 520
+        },
+        {
+          "text": "X2-Under",
+          "odds": 840
+        }
+      ]
+    },
+    {
+      "id": 22272,
+      "text": "Handicap 0:1",
+      "categoryIds": [
+        1,
+        4
+      ],
+      "subcategoryIds": [
+        6
+      ],
+      "placeholders": [],
+      "isPrimary": false,
+      "hc": "0:1",
+      "hcAnchor": 1,
+      "tips": [
+        {
+          "text": "1",
+          "odds": 165
+        },
+        {
+          "text": "X",
+          "odds": 450
+        },
+        {
+          "text": "2",
+          "odds": 325
+        }
+      ]
+    }
+  ]
+}
